@@ -1,0 +1,19 @@
+<%- include('includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/product.css">
+</head>
+
+<body>
+    <%- include('includes/navigation.ejs') %>
+
+    <main>
+        <% if (allUsers.length > 0) { %>
+            <ul>
+                <% for (let user of allUsers) { %>
+                    <li><%= user.name %></li>
+                <% } %>
+            </ul>
+        <% } else {%>
+            <h1>No Users Found!</h1>
+        <% } %>
+    </main>
+<%- include('includes/end.ejs') %>
