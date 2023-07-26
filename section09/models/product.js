@@ -49,15 +49,13 @@ module.exports = class Product {
     });
   }
 
-  static deleteById(prodId,) {
+  static deleteById(id) {
     getProductsFromFile(products => {
-      const product = products.find(prod => prod.id === prodId);
-      const updatedProducts = products.filter(prod => prod.id !== prodId);
+      const product = products.find(prod => prod.id === id);
+      const updatedProducts = products.filter(prod => prod.id !== id);
       fs.writeFile(p, JSON.stringify(updatedProducts), err => {
-        if (err) {
-          console.log(err);
-        } else {
-          Cart.deleteProduct(prodId, product.price);
+        if (!err) {
+          Cart.deleteProduct(id, product.price);
         }
       });
     });
