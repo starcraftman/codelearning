@@ -1,7 +1,8 @@
 const Sequelize = require('sequelize');
-const db = require('../util/database');
 
-const Product = db.define('product', {
+const sequelize = require('../util/database');
+
+const Product = sequelize.define('product', {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
@@ -21,6 +22,6 @@ const Product = db.define('product', {
     type: Sequelize.STRING,
     allowNull: false
   }
-})
+});
 
 module.exports = Product;
