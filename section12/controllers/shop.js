@@ -17,7 +17,7 @@ exports.getProducts = (req, res, next) => {
 // TODO: Bug, weirdly called 3 times???
 exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
-  console.log('prodId', prodId)
+  console.log('getProduct() prodId', prodId)
   Product.findById(prodId)
     .then(product => {
       res.render('shop/product-detail', {
