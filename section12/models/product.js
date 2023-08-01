@@ -1,20 +1,41 @@
 const { getDb } = require('../util/database');
+const mongodb = require('mongodb');
 
 class Product {
-  constructor(title, price, description, imageUrl) {
+  constructor(title, price, description, imageUrl, id) {
     this.title = title;
     this.price = price;
     this.description = description;
     this.imageUrl = imageUrl;
+    this._id = id;
+    if (id) {
+      this._id = new mongodb.ObjectId(id);
+    }
   }
 
   save() {
+    console.log('save id found', this._id)
+    if (this._id) {
+      return getDb().collection('products')
+      .updateOne({_id: this._id}, {$set: this})
+      .catch(err => console.log(err));
+    } else {
+      return getDb().collection('products')
+        .insertOne(this)
+        .catch(err => console.log(err));
+    }
+  }
+
+  static findById(prodId) {
+    console.log('findById', prodId);
     return getDb().collection('products')
-      .insertOne(this)
-      // .then(result => {
-      //   console.log(result);
-      // })
-      .catch(err => console.log(err))
+    .find({_id: new mongodb.ObjectId(prodId) })
+    .next()
+    // .then(product => { 
+    //   console.log(product);
+    //   return product; 
+    // })
+    .catch(err => console.log(err))
   }
 
   static fetchAll() {
@@ -26,6 +47,12 @@ class Product {
       //   return products; 
       // })
       .catch(err => console.log(err))
+  }
+
+  static deleteById(prodId) {
+    return getDb().collection('products')
+    .deleteOne({_id: new mongodb.ObjectId(prodId) })
+    .catch(err => console.log(err))
   }
 }
 
