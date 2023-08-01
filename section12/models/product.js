@@ -12,6 +12,7 @@ class Product {
   }
 
   save() {
+    console.log('toSave', this);
     if (this._id) {
       return getDb().collection('products')
       .updateOne({_id: this._id}, {$set: this})
