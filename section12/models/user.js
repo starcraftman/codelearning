@@ -20,26 +20,43 @@ class User {
   }
 
   addToCart(product) {
-    const cartProduct = this.cart.items.find(cartProd => {
+    const cartProductIndex = this.cart.items.findIndex(cartProd => {
       return "" + cartProd.productId === "" + product._id;
     });
-    console.log('final cartProduct', cartProduct)
-    let updatedCart;
-
-    if (!cartProduct) {
-      updatedCart = {
-        items: [...this.cart.items, {productId: product._id, quantity: 1}], 
-      };
+    
+    const updatedCartItems = [...this.cart.items];
+    if (cartProductIndex == -1) {
+      updatedCartItems.push({productId: product._id, quantity: 1})
     } else {
-      cartProduct.quantity += 1;
-      updatedCart = {
-        items: this.cart.items, 
-      };
+      updatedCartItems[cartProductIndex].quantity += 1;
     }
 
     return getDb().collection('users')
-    .updateOne({_id: this._id}, {$set: {cart: updatedCart}})
-    .catch(err => console.log(err));  
+      .updateOne({_id: this._id}, {$set: {cart: {items: updatedCartItems}}})
+      .catch(err => console.log(err));  
+  }
+
+  removeFromCart(productId) {
+    productId = "" + productId;
+    const updatedCartItems = this.cart.items.filter(item => item.productId + "" !== productId)
+
+    return getDb().collection('users')
+      .updateOne({_id: this._id}, {$set: {cart: {items: updatedCartItems}}})
+      .catch(err => console.log(err));  
+  }
+
+  getCart() {
+    const lookupProduct = {};
+    this.cart.items.forEach((item) => lookupProduct["" + item.productId] = item.quantity)
+    
+    return getDb().collection('products')
+      .find({_id: {$in: this.cart.items.map(x => x.productId)}})
+      .toArray()
+      .then(products => {
+        return products.map(prod => {
+          return {...prod, quantity: lookupProduct["" + prod._id]};
+        })
+      })
   }
 
   static findById(userId) {
