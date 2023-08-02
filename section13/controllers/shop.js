@@ -1,7 +1,9 @@
+const mongoose = require('mongoose');
+
 const Product = require('../models/product');
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then(products => {
       res.render('shop/product-list', {
         prods: products,
@@ -20,6 +22,7 @@ exports.getProduct = (req, res, next) => {
   console.log('getProduct() prodId', prodId)
   Product.findById(prodId)
     .then(product => {
+      console.log(product)
       res.render('shop/product-detail', {
         product: product,
         pageTitle: product.title,
@@ -30,7 +33,7 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then(products => {
       res.render('shop/index', {
         prods: products,
@@ -44,16 +47,14 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  req.user.getCart().then(x => console.log('cart', x));
-  req.user.cartTotal().then(x => console.log('total', x));
-
+  console.log(req.user.cartTotal())
   req.user
-    .getCart()
-    .then(products => {
+    .populate('cart.items.productId')
+    .then(user => {
       res.render('shop/cart', {
         path: '/cart',
         pageTitle: 'Your Cart',
-        products: products
+        products: user.cart.items
       });
     })
     .catch(err => console.log(err));
@@ -76,7 +77,7 @@ exports.postCartDeleteProduct = (req, res, next) => {
   req.user
     .removeFromCart(prodId)
     .then(result => {
-      console.log(result);
+      //console.log(result);
       res.redirect('/cart');
     })
     .catch(err => console.log(err));
