@@ -9,8 +9,13 @@ class User {
     this._id = id ? new mongodb.ObjectId(id) : id;
   }
 
-  subTotal() {
-    return this.cart.items.reduce((left, right) => left + right, 0.0);
+  cartTotal() {
+    return this.getCart().then(cart => {
+      return cart.
+        map(item => item.price * item.quantity).
+        reduce((x, y) => x + y, 0.0);
+    })
+    .catch(err => console.log(err));
   }
 
   save() {
@@ -57,6 +62,44 @@ class User {
           return {...prod, quantity: lookupProduct["" + prod._id]};
         })
       })
+      .catch(err => console.log(err));  
+  }
+
+  addOrder() {
+    const db = getDb();
+    return this.getCart().then(products => {
+      const order = {
+        items: products,
+        user: {
+          _id: this._id,
+          name: this.username,
+          email: this.email
+        },
+        total: products
+          .map(item => item.price * item.quantity)
+          .reduce((x, y) => x + y, 0.0)
+      
+      }
+      return db.collection('orders')
+      .insertOne(order);
+    })
+    .then(result => {
+      this.cart = {items: []};
+      return db.collection('users')
+      .updateOne(
+        {_id: this._id}, 
+        {$set: {cart: {items: []}}}
+      )
+    })
+    .catch(err => console.log(err));  
+  }
+
+  getOrders() {
+    const db = getDb();
+    return db.collection('orders')
+      .find({'user._id': this._id})
+      .toArray()
+      .catch(err => console.log(err));  
   }
 
   static findById(userId) {
