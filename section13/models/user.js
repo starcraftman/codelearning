@@ -1,41 +1,6 @@
 const mongoose = require('mongoose');
 
-//   addOrder() {
-//     const db = getDb();
-//     return this.getCart().then(products => {
-//       const order = {
-//         items: products,
-//         user: {
-//           _id: this._id,
-//           name: this.username,
-//           email: this.email
-//         },
-//         total: products
-//           .map(item => item.price * item.quantity)
-//           .reduce((x, y) => x + y, 0.0)
-      
-//       }
-//       return db.collection('orders')
-//       .insertOne(order);
-//     })
-//     .then(result => {
-//       this.cart = {items: []};
-//       return db.collection('users')
-//       .updateOne(
-//         {_id: this._id}, 
-//         {$set: {cart: {items: []}}}
-//       )
-//     })
-//     .catch(err => console.log(err));  
-//   }
-
-//   getOrders() {
-//     const db = getDb();
-//     return db.collection('orders')
-//       .find({'user._id': this._id})
-//       .toArray()
-//       .catch(err => console.log(err));  
-//   }
+const Order = require('./order');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -84,19 +49,9 @@ userSchema.methods.removeFromCart = function(productId) {
   return this.save();
 }
 
-userSchema.methods.cartTotal = function() {
-  this
-    .populate('cart.items.productId')
-    .then(user => {
-      console.log(user.cart.items);
-      return user.cart.items
-        .map(item => item.productId.price * item.quantity)
-        .reduce((x, y) => x + y, 0.0);
-  })
-  .then(result => {
-    console.log(result);
-    return result;
-  })
-  .catch(err => console.log(err));
+userSchema.methods.clearCart = function() {
+  this.cart = {items: []};
+  return this.save();
 }
+
 module.exports = mongoose.model('User', userSchema);

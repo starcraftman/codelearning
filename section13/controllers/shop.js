@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const Product = require('../models/product');
+const Order = require('../models/order');
 
 exports.getProducts = (req, res, next) => {
   Product.find()
@@ -47,7 +48,6 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  console.log(req.user.cartTotal())
   req.user
     .populate('cart.items.productId')
     .then(user => {
@@ -85,7 +85,31 @@ exports.postCartDeleteProduct = (req, res, next) => {
 
 exports.postOrder = (req, res, next) => {
   req.user
-    .addOrder()
+  .populate('cart.items.productId')
+  .then(user => {
+    const total = user.cart.items
+      .map(item => item.productId.price * item.quantity)
+      .reduce((x, y) => x + y, 0.0);
+    const products = user.cart.items.map(item => {
+      return {
+        quantity: item.quantity,
+        product: item.productId._doc
+      }
+    });
+    const order = new Order ({
+      user: {
+        name: req.user.name,
+        userId: req.user
+      },
+      products: products,
+      total: total
+    })
+    console.log('order', order);
+    return order.save();
+  })
+    .then(result => {
+      req.user.clearCart();
+    })
     .then(result => {
       res.redirect('/orders');
     })
@@ -93,8 +117,7 @@ exports.postOrder = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-  req.user
-    .getOrders()
+  Order.find({'user.userId': req.user._id})
     .then(orders => {
       console.log(orders);
       res.render('shop/orders', {
