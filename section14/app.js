@@ -31,14 +31,15 @@ app.use(session(
   store: store
 }))
 
-// app.use((req, res, next) => {
-//   User.findOne({'email': 'max@test.com'})
-//     .then(user => {
-//       req.user = user;
-//       next();
-//     })
-//     .catch(err => console.log(err));
-// });
+// Not included in video, perhaps api change?
+// When user set, hydrate it on new request. Otherwise missing instance methods.
+app.use((req, res, next) => {
+  if (req.session.user) {
+    req.session.user = User.hydrate(req.session.user);
+  }
+
+  next();
+});
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
