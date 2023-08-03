@@ -49,10 +49,6 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  if (!req.session.user) {
-    return res.redirect('/')
-  }
-
   req.session.user
     .populate('cart.items.productId')
     .execPopulate()
@@ -73,7 +69,7 @@ exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
   Product.findById(prodId)
   .then(product => {
-    return user.addToCart(product);
+    return req.session.user.addToCart(product);
   })
   .then(result => {
     console.log(result);
@@ -83,10 +79,15 @@ exports.postCart = (req, res, next) => {
 
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
+  console.log(req.session.user);
   req.session.user
     .removeFromCart(prodId)
     .then(result => {
-      res.redirect('/cart');
+    User.findOne({'email': 'max@test.com'})
+      .then(user => {
+        req.session.user = user;
+        res.redirect('/cart')
+      })
     })
     .catch(err => console.log(err));
 };
@@ -112,16 +113,16 @@ exports.postOrder = (req, res, next) => {
       return req.session.user.clearCart();
     })
     .then(() => {
+      User.findOne({'email': 'max@test.com'})
+      .then(user => {
+        req.session.user = user;
+      })
       res.redirect('/orders');
     })
     .catch(err => console.log(err));
 };
 
-exports.getOrders = (req, res, next) => {
-  if (!req.session.user) {
-    return res.redirect('/')
-  }
-  
+exports.getOrders = (req, res, next) => {  
   Order.find({ 'user.userId': req.session.user._id })
     .then(orders => {''
       res.render('shop/orders', {

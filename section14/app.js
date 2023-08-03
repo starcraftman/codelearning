@@ -31,7 +31,6 @@ app.use(session(
   store: store
 }))
 
-// Not included in video, perhaps api change?
 // When user set, hydrate it on new request. Otherwise missing instance methods.
 app.use((req, res, next) => {
   if (req.session.user) {
