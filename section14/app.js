@@ -31,13 +31,19 @@ app.use(session(
   store: store
 }))
 
-// When user set, hydrate it on new request. Otherwise missing instance methods.
+// When user was logged in via session, always query latest version.
+// Alternative if document doesn't change User.hydrate(req.session.user);
 app.use((req, res, next) => {
   if (req.session.user) {
-    req.session.user = User.hydrate(req.session.user);
+    User.findOne({'_id': req.session.user._id})
+    .then(user => {
+      req.user = user
+      return next();
+    })
+    .catch(err => console.log(err));
+  } else {
+    return next();
   }
-
-  next();
 });
 
 app.use('/admin', adminRoutes);
