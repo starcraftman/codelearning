@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session)
+const csrf = require('csurf');
+const connectFlash = require('connect-flash');
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -19,6 +21,7 @@ const store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: 'sessions'
 });
+const csrfProtection = csrf();
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -30,6 +33,8 @@ app.use(session(
   saveUninitialized: false,
   store: store
 }))
+app.use(csrfProtection);
+app.use(connectFlash())
 
 // When user was logged in via session, always query latest version.
 // Alternative if document doesn't change User.hydrate(req.session.user);
@@ -45,6 +50,12 @@ app.use((req, res, next) => {
     return next();
   }
 });
+
+app.use((req, res, next) => {
+  req.app.locals.user = req.session.user;
+  req.app.locals.csrfToken = req.csrfToken();
+  next();
+})
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);

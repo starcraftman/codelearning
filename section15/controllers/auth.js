@@ -3,19 +3,34 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 exports.getLogin = (req, res, next) => {
-  console.log(req.session);
+  let errorMsg = req.flash('error');
+  if (errorMsg.length > 0) {
+    errorMsg = errorMsg[0];
+  } else {
+    errorMsg = null;
+  }
+
   res.render('auth/login', {
     pageTitle: 'Login',
     path: '/login',
     user: false,
+    errorMessage: errorMsg
   });
 };
 
 exports.getSignup = (req, res, next) => {
+  let errorMsg = req.flash('error');
+  if (errorMsg.length > 0) {
+    errorMsg = errorMsg[0];
+  } else {
+    errorMsg = null;
+  }
+
   res.render('auth/signup', {
     path: '/signup',
     pageTitle: 'Signup',
-    user: false
+    user: false,
+    errorMessage: errorMsg
   });
 };
 
@@ -23,6 +38,7 @@ exports.postLogin = (req, res, next) => {
   User.findOne({'email': req.body.email})
   .then(user => {
     if (!user) {
+      req.flash('error', 'Invalid email or password')
       return res.redirect('/login');
     }
 
@@ -39,6 +55,7 @@ exports.postLogin = (req, res, next) => {
           })
         }
         
+        req.flash('error', 'Invalid email or password')
         return res.redirect('/login')
       })
       .catch(err => console.log(err))
@@ -59,12 +76,14 @@ exports.postLogout = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
   // Sanity
   if (!req.body.email || !req.body.password) {
+    req.flash('error', 'Missing email or password fields.')
     return res.redirect('/signup');
   }
 
   User.findOne({email: req.body.email})
     .then(userDoc => {
       if (userDoc) {
+        req.flash('error', 'Email already registered.')
         return res.redirect('/signup')
       }
 
