@@ -118,11 +118,13 @@ exports.postLogin = (req, res, next) => {
               },
               validationErrors: [{path: 'email'}, {path: 'password'}],
           });         })
-        .catch(err => console.log(err))
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
-
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy((err) => {
@@ -176,7 +178,11 @@ exports.postSignup = (req, res, next) => {
       //   html: '<h1>You signed up, welcome aboard.</h1>'
       // })
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.getReset = (req, res, next) => {
@@ -228,7 +234,11 @@ exports.postReset = (req, res, next) => {
         // Didn't complete the identity creation.
         // return transporter.sendMail(mail);
       })
-      .catch(err => console.log(err))
+      .catch(err => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+      })
   })
 }
 
@@ -257,7 +267,11 @@ exports.getNewPassword = (req, res, next) => {
         passwordToken: req.params.token
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 }
 
 exports.postNewPassword = (req, res, next) => {
@@ -284,6 +298,9 @@ exports.postNewPassword = (req, res, next) => {
     .then(result => {
       return res.redirect('/login')
     })
-    .catch(err => console.log(err))
-
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 }
