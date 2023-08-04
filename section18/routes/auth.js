@@ -14,11 +14,13 @@ router.post(
     '/login', 
     [
         body('email', 'Please enter a valid email.')
-            .isEmail(),
+            .isEmail()
+            .normalizeEmail(),
         body('password', 
             'Please enter a password with only numbers and characters, at least length 5.')
            .isLength({min: 5})
-           .isAlphanumeric(),
+           .isAlphanumeric()
+           .trim(),
     ],
     authController.postLogin
 );
@@ -36,11 +38,13 @@ router.post(
                     return Promise.reject('Email exists already, please pick a different one.')
                   }
                 })
-            }),
+            })
+            .normalizeEmail(),
         body('password', 
              'Please enter a password with only numbers and characters, at least length 5.')
             .isLength({min: 5})
-            .isAlphanumeric(),
+            .isAlphanumeric()
+            .trim(),
         body('confirmPassword', 'Passwords have to match!')
             .custom((value, {req}) => {
                 return value === req.body.password

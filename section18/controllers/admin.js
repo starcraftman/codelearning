@@ -1,23 +1,48 @@
+const { validationResult } = require('express-validator')
+
 const Product = require('../models/product');
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
+    product: {
+      title: '',
+      price: '',
+      imageUrl: '',
+      description: '',
+      _id: ''
+    },
     editing: false,
+    validationErrors: [],
   });
 };
 
 exports.postAddProduct = (req, res, next) => {
-  const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
-  const price = req.body.price;
-  const description = req.body.description;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res
+      .status(422)
+      .render('admin/add-product', {
+        path: '/admin/add-product',
+        pageTitle: 'Add Product',
+        product: {
+          title: req.body.title,
+          price: req.body.price,
+          imageUrl: req.body.imageUrl,
+          description: req.body.description,
+          _id: ''
+        },
+        editing: false,
+        validationErrors: errors.array(),
+      });
+  }
+
   const product = new Product({
-    title: title,
-    price: price,
-    description: description,
-    imageUrl: imageUrl,
+    title: req.body.title,
+    price: req.body.price,
+    imageUrl: req.body.imageUrl,
+    description: req.body.description,
   });
   product
     .save()
@@ -47,12 +72,32 @@ exports.getEditProduct = (req, res, next) => {
         path: '/admin/edit-product',
         editing: editMode,
         product: product,
+        validationErrors: [],
       });
     })
     .catch(err => console.log(err));
 };
 
 exports.postEditProduct = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res
+      .status(422)
+      .render('admin/edit-product', {
+        path: '/admin/edit-product',
+        pageTitle: 'Edit Product',
+        product: {
+          title: req.body.title,
+          price: req.body.price,
+          imageUrl: req.body.imageUrl,
+          description: req.body.description,
+          _id: req.body.productId
+        },
+        editing: true,
+        validationErrors: errors.array(),
+      });
+  }
+
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;

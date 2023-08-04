@@ -246,6 +246,7 @@ form {
   border-color: red;
   background: rgb(240, 142, 96);
   color: red;
+  margin-bottom: 1rem;
 }
 
 @media (min-width: 768px) {
@@ -259,6 +260,5 @@ form {
 
   .user-message {
     width: 30rem;
-
   }
 }
