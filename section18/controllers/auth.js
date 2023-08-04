@@ -41,7 +41,13 @@ exports.getSignup = (req, res, next) => {
     path: '/signup',
     pageTitle: 'Signup',
     user: false,
-    errorMessage: errorMsg
+    errorMessage: errorMsg,
+    oldInput: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    validationErrors: [],
   });
 };
 
@@ -58,39 +64,39 @@ exports.postLogin = (req, res, next) => {
       });
   }
 
-  User.findOne({'email': req.body.email})
-  .then(user => {
-    if (!user) {
-      req.flash('error', 'Invalid email or password')
-      return res.redirect('/login');
-    }
-    bcrypt.compare(req.body.password, user.password)
-      .then(doMatch => {
-        if (doMatch) {
-          req.session.user = user;
-          return req.session.save(err => {
-            if (err) { 
-              console.log(err);
-            }
-
-            return res.redirect('/');
-          })
-        }
-        
+  User.findOne({ 'email': req.body.email })
+    .then(user => {
+      if (!user) {
         req.flash('error', 'Invalid email or password')
-        return res.redirect('/login')
-      })
-      .catch(err => console.log(err))
-  })
-  .catch(err => console.log(err));
+        return res.redirect('/login');
+      }
+      bcrypt.compare(req.body.password, user.password)
+        .then(doMatch => {
+          if (doMatch) {
+            req.session.user = user;
+            return req.session.save(err => {
+              if (err) {
+                console.log(err);
+              }
+
+              return res.redirect('/');
+            })
+          }
+
+          req.flash('error', 'Invalid email or password')
+          return res.redirect('/login')
+        })
+        .catch(err => console.log(err))
+    })
+    .catch(err => console.log(err));
 };
 
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy((err) => {
-    if (err) { 
+    if (err) {
       console.log(err);
-    }    
+    }
     res.redirect('/');
   });
 };
@@ -104,7 +110,13 @@ exports.postSignup = (req, res, next) => {
         path: '/signup',
         pageTitle: 'Signup',
         user: false,
-        errorMessage: errors.array()[0].msg
+        errorMessage: errors.array()[0].msg,
+        oldInput: {
+          email: req.body.email,
+          password: req.body.password,
+          confirmPassword: req.body.confirmPassword
+        },
+        validationErrors: errors.array(),
       });
   }
 
@@ -113,7 +125,7 @@ exports.postSignup = (req, res, next) => {
     req.flash('error', 'Missing email or password fields.')
     return res.redirect('/signup');
   }
-  
+
   return bcrypt.hash(req.body.password, 12)
     .then(hashedPass => {
       const newUser = new User({
@@ -124,14 +136,14 @@ exports.postSignup = (req, res, next) => {
       return newUser.save();
     }).then(result => {
       return res.redirect('/login')
-          // Didn't complete the identity creation.
-          // return transporter.sendMail({
-          //   to: req.body.email,
-          //   from: 'shop@node-complete.com',
-          //   subject: 'signup success',
-          //   html: '<h1>You signed up, welcome aboard.</h1>'
-          // })
-      })
+      // Didn't complete the identity creation.
+      // return transporter.sendMail({
+      //   to: req.body.email,
+      //   from: 'shop@node-complete.com',
+      //   subject: 'signup success',
+      //   html: '<h1>You signed up, welcome aboard.</h1>'
+      // })
+    })
     .catch(err => console.log(err))
 };
 
@@ -157,9 +169,9 @@ exports.postReset = (req, res, next) => {
       console.log(err);
       return res.redirect('/reset');
     }
-    
+
     const token = buffer.toString('hex');
-    User.findOne({email: req.body.email})
+    User.findOne({ email: req.body.email })
       .then(user => {
         if (!user) {
           req.flash('error', 'Invalid email requested.')
@@ -171,18 +183,18 @@ exports.postReset = (req, res, next) => {
         return user.save();
       })
       .then(result => {
-          const mail = {
-            to: req.body.email,
-            from: 'shop@node-complete.com',
-            subject: 'password reset',
-            html: `<p>Requested password reset.</p>
+        const mail = {
+          to: req.body.email,
+          from: 'shop@node-complete.com',
+          subject: 'password reset',
+          html: `<p>Requested password reset.</p>
             <p>Click this <a href="http://localhost:3000/new-password/${token}">link</a> to set a new password.
             `
-          }
-          console.log(mail);
-          return res.redirect('/reset')
-          // Didn't complete the identity creation.
-          // return transporter.sendMail(mail);
+        }
+        console.log(mail);
+        return res.redirect('/reset')
+        // Didn't complete the identity creation.
+        // return transporter.sendMail(mail);
       })
       .catch(err => console.log(err))
   })
@@ -190,9 +202,9 @@ exports.postReset = (req, res, next) => {
 
 exports.getNewPassword = (req, res, next) => {
   User.findOne({
-      resetToken: req.params.token,
-      resetTokenExpiry: {$gt: Date.now()}
-    })
+    resetToken: req.params.token,
+    resetTokenExpiry: { $gt: Date.now() }
+  })
     .then(user => {
       if (!user) {
         req.flash('error', 'Invalid reset password token. Request a new link!')
@@ -203,7 +215,7 @@ exports.getNewPassword = (req, res, next) => {
       } else {
         errorMsg = null;
       }
-    
+
       res.render('auth/new-password', {
         path: '/new-password',
         pageTitle: 'New Password',
@@ -220,16 +232,16 @@ exports.postNewPassword = (req, res, next) => {
   console.log(req.body);
   User.findOne({
     resetToken: req.body.passwordToken,
-    resetTokenExpiry: {$gt: new Date()},
+    resetTokenExpiry: { $gt: new Date() },
     _id: req.body.userId
   })
-  .then(user => {
-    if (!user) {
-      req.flash('error', 'Invalid reset password token. Request a new link!')
-    }
+    .then(user => {
+      if (!user) {
+        req.flash('error', 'Invalid reset password token. Request a new link!')
+      }
 
-    return bcrypt.hash(req.body.password, 12)
-      .then(hashedPass => {
+      return bcrypt.hash(req.body.password, 12)
+        .then(hashedPass => {
           console.log(user);
           user.password = hashedPass;
           user.resetToken = null;
@@ -237,9 +249,9 @@ exports.postNewPassword = (req, res, next) => {
           return user.save();
         });
     })
-  .then(result => {
-    return res.redirect('/login')
-  })
-  .catch(err => console.log(err))
- 
+    .then(result => {
+      return res.redirect('/login')
+    })
+    .catch(err => console.log(err))
+
 }
