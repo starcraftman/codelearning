@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
+const { validationResult } = require('express-validator')
 
 const User = require('../models/user');
 const user = require('../models/user');
@@ -45,13 +46,24 @@ exports.getSignup = (req, res, next) => {
 };
 
 exports.postLogin = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res
+      .status(422)
+      .render('auth/login', {
+        path: '/login',
+        pageTitle: 'Login',
+        user: false,
+        errorMessage: errors.array()[0].msg
+      });
+  }
+
   User.findOne({'email': req.body.email})
   .then(user => {
     if (!user) {
       req.flash('error', 'Invalid email or password')
       return res.redirect('/login');
     }
-
     bcrypt.compare(req.body.password, user.password)
       .then(doMatch => {
         if (doMatch) {
@@ -84,31 +96,34 @@ exports.postLogout = (req, res, next) => {
 };
 
 exports.postSignup = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res
+      .status(422)
+      .render('auth/signup', {
+        path: '/signup',
+        pageTitle: 'Signup',
+        user: false,
+        errorMessage: errors.array()[0].msg
+      });
+  }
+
   // Sanity
   if (!req.body.email || !req.body.password) {
     req.flash('error', 'Missing email or password fields.')
     return res.redirect('/signup');
   }
-
-  User.findOne({email: req.body.email})
-    .then(userDoc => {
-      if (userDoc) {
-        req.flash('error', 'Email already registered.')
-        return res.redirect('/signup')
-      }
-
-      return bcrypt.hash(req.body.password, 12)
-        .then(hashedPass => {
-          if (req.body.password == req.body.confirmPassword) {
-            const newUser = new User({
-              email: req.body.email,
-              password: hashedPass,
-              cart: { items: [] },
-            })
-            return newUser.save();
-          }
-        }).then(result => {
-          return res.redirect('/login')
+  
+  return bcrypt.hash(req.body.password, 12)
+    .then(hashedPass => {
+      const newUser = new User({
+        email: req.body.email,
+        password: hashedPass,
+        cart: { items: [] },
+      })
+      return newUser.save();
+    }).then(result => {
+      return res.redirect('/login')
           // Didn't complete the identity creation.
           // return transporter.sendMail({
           //   to: req.body.email,
@@ -116,9 +131,7 @@ exports.postSignup = (req, res, next) => {
           //   subject: 'signup success',
           //   html: '<h1>You signed up, welcome aboard.</h1>'
           // })
-        })
-        .catch(err => console.log(err))
-    })
+      })
     .catch(err => console.log(err))
 };
 
@@ -206,7 +219,7 @@ exports.getNewPassword = (req, res, next) => {
 exports.postNewPassword = (req, res, next) => {
   console.log(req.body);
   User.findOne({
-    resetToken: 'c9c0d1ee6818550c8e28ed754e718a6395a8b7718cecd1b2d327ea69c594cabd',
+    resetToken: req.body.passwordToken,
     resetTokenExpiry: {$gt: new Date()},
     _id: req.body.userId
   })
