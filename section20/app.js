@@ -8,6 +8,7 @@ const MongoDBStore = require('connect-mongodb-session')(session)
 const csrf = require('csurf');
 const connectFlash = require('connect-flash');
 const multer = require('multer')
+const sanitizeFile = require('sanitize-file');
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -28,12 +29,12 @@ const multerStore = multer.diskStorage({
     cb(null, 'images');
   },
   filename: (req, file, cb) => {
-    cb(null, 'test' + '-' + file.originalname)
+    cb(null, Date.now().toString() + '-' + file.originalname)
   }
 })
 const multerFilter = (req, file, cb) => {
   cb(
-    null, 
+    null,
     ['image/png', 'image/jpg', 'image/jpeg'].includes(file.mimetype)
   );
 }
@@ -44,8 +45,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({storage: multerStore, fileFilter: multerFilter}).single('image'))
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
-  secret: 'my secret', 
-  resave: false, 
+  secret: 'my secret',
+  resave: false,
   saveUninitialized: false,
   store: store
 }))
@@ -87,8 +88,8 @@ app.use(authRoutes);
 app.use('/500', errorController.get500);
 app.use(errorController.get404);
 app.use((err, req, res, next) => {
-  res.status(500).render('500', { 
-    pageTitle: 'Critical Error', 
+  res.status(500).render('500', {
+    pageTitle: 'Critical Error',
     path: '/500',
   });
 });
