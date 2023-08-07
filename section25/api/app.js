@@ -14,7 +14,7 @@ const getSecret = (secret) => {
         {
             encoding: 'utf-8'
         }
-        );
+    );
 };
 
 const app = express();
@@ -22,6 +22,7 @@ const app = express();
 
 // app.use(bodyParser.urlencoded()); // x-www-form-urlencoded <form>
 app.use(bodyParser.json()); // application/json
+app.use('/images', express.static(path.join(path.dirname(__filename), 'images')));
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -31,6 +32,17 @@ app.use((req, res, next) => {
 });
 
 app.use('/feed', feedRoutes);
+
+app.use((err, req, res, next) => {
+    console.log('CRITICAL SERVER ERROR:', err);
+
+    return res
+        .status(err.statusCode)
+        .json({
+            message: err.toString(),
+            code: err.statusCode
+        })
+})
 
 mongoose.connect(getSecret('dbUri'))
 .then(result => {
