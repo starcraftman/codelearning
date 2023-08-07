@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator')
 
 const Product = require('../models/product');
+const fileHelp = require('../util/file');
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -9,7 +10,6 @@ exports.getAddProduct = (req, res, next) => {
     product: {
       title: '',
       price: '',
-      imageUrl: '',
       description: '',
       _id: ''
     },
@@ -54,11 +54,13 @@ exports.postAddProduct = (req, res, next) => {
     price: req.body.price,
     imageUrl: req.file.path,
     description: req.body.description,
+    userId: req.user._id
   });
+  console.log('new product', product);
   product
     .save()
     .then(result => {
-      // console.log(result);
+      console.log(result);
       console.log('Created Product');
       res.redirect('/admin/products');
     })
@@ -106,7 +108,6 @@ exports.postEditProduct = (req, res, next) => {
         product: {
           title: req.body.title,
           price: req.body.price,
-          imageUrl: req.body.imageUrl,
           description: req.body.description,
           _id: req.body.productId
         },
@@ -118,7 +119,6 @@ exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
-  const updatedImageUrl = req.body.imageUrl;
   const updatedDesc = req.body.description;
 
   Product.findById(prodId)
@@ -129,8 +129,11 @@ exports.postEditProduct = (req, res, next) => {
       product.title = updatedTitle;
       product.price = updatedPrice;
       product.description = updatedDesc;
-      product.imageUrl = updatedImageUrl;
-      return product.save()
+      if (req.file) {
+        fileHelp.deleteFile(product.imageUrl);
+        product.imageUrl = req.file.path;
+      }
+       return product.save()
       .then(result => {
         console.log('UPDATED PRODUCT!');
         res.redirect('/admin/products');
@@ -164,15 +167,21 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteOne({
-    _id: prodId,
-    userId: req.user._id
-  })
+  console.log('del', prodId)
+  Product.findById(prodId)
+    .then(product => {
+      fileHelp.deleteFile(product.imageUrl);
+      return Product.deleteOne({
+        _id: prodId,
+        userId: req.user._id
+      })
+    })
     .then(() => {
       console.log('DESTROYED PRODUCT');
       res.redirect('/admin/products');
     })
     .catch(err => {
+      console.log(err);
       const error = new Error(err);
       error.httpStatusCode = 500;
       return next(error);

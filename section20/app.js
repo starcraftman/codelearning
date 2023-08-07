@@ -8,7 +8,7 @@ const MongoDBStore = require('connect-mongodb-session')(session)
 const csrf = require('csurf');
 const connectFlash = require('connect-flash');
 const multer = require('multer')
-const sanitizeFile = require('sanitize-file');
+const sanitizeFile = require('sanitize-filename');
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -29,7 +29,7 @@ const multerStore = multer.diskStorage({
     cb(null, 'images');
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now().toString() + '-' + file.originalname)
+    cb(null, sanitizeFile(Date.now().toString() + '-' + file.originalname))
   }
 })
 const multerFilter = (req, file, cb) => {
@@ -44,6 +44,8 @@ app.set('views', 'views');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({storage: multerStore, fileFilter: multerFilter}).single('image'))
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 app.use(session({
   secret: 'my secret',
   resave: false,
