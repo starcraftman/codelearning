@@ -30,6 +30,7 @@
     "nodemailer": "^6.9.4",
     "nodemailer-sendgrid-transport": "^0.2.0",
     "pdfkit": "^0.13.0",
-    "sanitize-filename": "^1.6.3"
+    "sanitize-filename": "^1.6.3",
+    "stripe": "^12.17.0"
   }
 }

@@ -90,6 +90,7 @@ app.use(authRoutes);
 app.use('/500', errorController.get500);
 app.use(errorController.get404);
 app.use((err, req, res, next) => {
+  console.log("ERROR HANDLER:\n", err);
   res.status(500).render('500', {
     pageTitle: 'Critical Error',
     path: '/500',
