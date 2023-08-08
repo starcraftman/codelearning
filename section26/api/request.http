@@ -1,0 +1,25 @@
+GET http://localhost:8080/feed/posts
+
+####
+
+POST  http://localhost:8080/feed/post HTTP/1.1
+content-type: application/json
+
+{
+    "title": "Simp",
+    "Content": "Hello world"
+}
+
+####
+POST  http://localhost:8080/auth/login HTTP/1.1
+content-type: application/json
+
+{
+    "email": "test@test.com",
+    "password": "testing"
+}
+
+
+####
+GET  http://localhost:8080/feed/post/64d2705f3dffc7b7847b8c92 HTTP/1.1
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJ1c2VySWQiOiI2NGQyODU2ZjMyMWYxMGFmMjY1ZTUwNTgiLCJpYXQiOjE2OTE1MjI3MzksImV4cCI6MTY5MTUyNjMzOX0.Aa5N3GIBts24uE4vf6IyxY5ML3X8txJPlcGe2GShfjc
