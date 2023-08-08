@@ -12,6 +12,7 @@ router.get('/posts', isAuth, feedController.getPosts);
 // POST /feed/post
 router.post(
     '/post', 
+    isAuth,
     [
         body('title', 'title is invalid')
             .trim()
@@ -23,10 +24,11 @@ router.post(
     feedController.createPost
 );
 
-router.get('/post/:postId', feedController.getPostId);
+router.get('/post/:postId', isAuth, feedController.getPostId);
 
 router.put(
     '/post/:postId', 
+    isAuth,
     [
         body('title', 'title is invalid')
             .trim()
@@ -38,6 +40,6 @@ router.put(
     feedController.updatePost
 );
 
-router.delete('/post/:postId', feedController.deletePost);
+router.delete('/post/:postId', isAuth, feedController.deletePost);
 
 module.exports = router;

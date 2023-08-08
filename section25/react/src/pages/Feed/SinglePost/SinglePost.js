@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 
 import Image from '../../../components/Image/Image';
 import './SinglePost.css';
-import SITE from '../Feed';
 
+const SITE = 'http://localhost:8080'
 
 class SinglePost extends Component {
   state = {
@@ -15,8 +15,15 @@ class SinglePost extends Component {
   };
 
   componentDidMount() {
+    console.log('mounted', `${SITE}/feed/post/${postId}`)
     const postId = this.props.match.params.postId;
-    fetch(`${SITE}/feed/post/${postId}`)
+    console.log('postSingle', postId)
+    fetch(`${SITE}/feed/post/${postId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.props.token}`
+        }
+      })
       .then(res => {
         if (res.status !== 200) {
           throw new Error('Failed to fetch status');
