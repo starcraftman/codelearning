@@ -203,3 +203,61 @@ exports.deletePost = (req, res, next) => {
     next(err);
   })
 }
+
+exports.getStatus = (req, res, next) => {
+  User.findById(req.userId)
+    .then(user => {
+      if (!user) {
+        const error = new Error("Could not find user.");
+        error.statusCode = 404;
+        throw error;
+      }
+
+      return res.json({
+        status: user.status
+      })
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    })
+}
+
+exports.postStatus = (req, res, next) => {
+  let foundUser;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error('Invalid status sent.');
+    error.statusCode = 422;
+    throw error;
+  }
+
+  User.findById(req.userId)
+    .then(user => {
+      if (!user) {
+        const error = new Error("Could not find user.");
+        error.statusCode = 404;
+        throw error;
+      }
+
+      foundUser = user;
+      user.status = req.body.status;
+      return user.save();
+    })
+    .then(result => {
+      return res
+        .status(200)
+        .json({
+          message: "Updated user status.",
+          status: foundUser.status
+        })
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    })
+}
