@@ -3,7 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
-const JWT_SECRET = 'somesupersecretsecret';
+const getSecret = require('../util/get-secret');
+const JWT_SECRET = getSecret('jwt');
 
 exports.putSignup = (req, res, next) => {
   const errors = validationResult(req);

@@ -9,16 +9,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const feedRoutes = require('./routes/feed');
 const userRoutes = require('./routes/auth');
-
-const SECRET_PATH = path.join(path.dirname(path.dirname(__filename)), 'secrets')
-const getSecret = (secret) => {
-    return fs.readFileSync(
-        path.join(SECRET_PATH, secret), 
-        {
-            encoding: 'utf-8'
-        }
-    );
-};
+const getSecret = require('./util/get-secret');
 
 const app = express();
 const fileStorage = multer.diskStorage({
