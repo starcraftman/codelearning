@@ -57,19 +57,39 @@ class Feed extends Component {
       page--;
       this.setState({ postPage: page });
     }
-    fetch(`${SITE}/feed/posts?page=${page}`,
-    {
+
+    let graphqlQuery = {
+      query: `
+      {
+        getPosts {
+          totalItems
+            posts {
+              title
+              imageUrl
+              content
+              creator {
+                name
+              }
+              createdAt
+          }
+        }
+      }    
+      `
+    }
+    fetch(`${SITE}/graphql`, {
+      method: "POST",
+      body: JSON.stringify(graphqlQuery),
       headers: {
-        Authorization: `Bearer ${this.props.token}`
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.props.token}`
       }
     })
       .then(res => {
-        if (res.status !== 200) {
-          throw new Error('Failed to fetch posts.');
-        }
         return res.json();
       })
       .then(resData => {
+        resData = resData.data.getPosts;
+        console.log(resData);
         this.setState({
           posts: resData.posts.map((post) => {
             return {
@@ -135,42 +155,71 @@ class Feed extends Component {
     formData.append('title', postData.title);
     formData.append('content', postData.content);
     formData.append('image', postData.image)
-    let method = 'POST';
-    let url = `${SITE}/feed/post`;
-    if (this.state.editPost) {
-      url = `${SITE}/feed/post/${this.state.editPost._id}`;
-      method = 'PUT';
-    } 
 
-    fetch(url, {
-      method: method,
-      body: formData,
+    let graphqlQuery = {
+      query: `
+        mutation {
+          createPost(input: {
+            title: "${postData.title}",
+            content: "${postData.content}",
+            imageUrl: "${postData.image}"
+          }) {
+            _id
+            title
+            content 
+            imageUrl
+            creator {
+              name
+            }
+            createdAt
+          }
+        }      
+      `
+    }
+    fetch(`${SITE}/graphql`, {
+      method: "POST",
+      body: JSON.stringify(graphqlQuery),
       headers: {
-        Authorization: `Bearer ${this.props.token}`
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.props.token}`
       }
     })
       .then(res => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Creating or editing a post failed!');
-        }
         return res.json();
       })
       .then(resData => {
         console.log('resData', resData);
+        if (resData.errors && resData.code === 401) {
+          throw new Error('Validation failed.');
+        }
+        if (resData.errors) {
+          throw new Error("Login failed!");
+        }
+        resData = resData.data.createPost;
         const post = {
-          _id: resData.post._id,
-          title: resData.post.title,
-          content: resData.post.content,
-          creator: resData.post.creator,
-          createdAt: resData.post.createdAt
+          _id: resData._id,
+          title: resData.title,
+          content: resData.content,
+          creator: resData.creator,
+          createdAt: resData.createdAt
         };
         this.setState(prevState => {
+          let updatedPosts = [...prevState.posts];
+          if (prevState.editPost) {
+            const postIndex = prevState.posts.findIndex(
+              p => p._id === prevState.editPost._id
+            );
+            updatedPosts[postIndex] = post;
+          } else {
+            updatedPosts.unshift(post);
+          }
           return {
+            posts: updatedPosts,
             isEditing: false,
             editPost: null,
             editLoading: false
           };
-        });
+        });        
       })
       .catch(err => {
         console.log(err);
