@@ -6,67 +6,62 @@ const User = require('../models/user');
 const getSecret = require('../util/get-secret');
 const JWT_SECRET = getSecret('jwt');
 
-exports.putSignup = (req, res, next) => {
+exports.putSignup = async (req, res, next) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new Error('Validation failed, invalid post data.');
-    error.statusCode = 422;
-    error.data = errors.array();
-    throw error;
-  }
   
-  bcrypt.hash(req.body.password, 12)
-    .then(hashedPw => {
-      const user = new User({
-        name: req.body.name,
-        password: hashedPw,
-        email: req.body.email,
+  try {
+    if (!errors.isEmpty()) {
+      const error = new Error('Validation failed, invalid post data.');
+      error.statusCode = 422;
+      error.data = errors.array();
+      throw error;
+    }
+
+    const hashedPw = await bcrypt.hash(req.body.password, 12);
+    const user = new User({
+      name: req.body.name,
+      password: hashedPw,
+      email: req.body.email,
+    })
+    await user.save()
+    return res
+      .status(201)
+      .json({
+        message: "User created!",
+        userId: user._id
       })
-      return user.save()
-    })
-    .then(result => {
-      res
-        .status(201)
-        .json({
-          message: "User create!",
-          userId: result._id
-        })
-    })
-    .catch(err => {
-        if (!err.statusCode) {
-            err.statusCode = 500;
-        }
-        next(err);
-    })
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  } 
 }
 
-exports.postLogin = (req, res, next) => {
+exports.postLogin = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  let loadedUser;
 
-  User.findOne({email: email})
-  .then(userDoc => {
-    if (!userDoc) {
+  try {
+    const user = await User.findOne({email: email});
+    if (!user) {
       const error = new Error("A user with email was not found.");
       error.statusCode = 401;
       throw error;
     }
-    loadedUser = userDoc;
-    console.log('loaded', loadedUser);
-    return bcrypt.compare(password, userDoc.password);
-  })
-  .then(isEqual => {
+
+    console.log('loaded', user);
+    const isEqual = await bcrypt.compare(password, user.password);
     if (!isEqual) {
       const error = new Error("Password incorrect.");
       error.statusCode = 401;
       throw error;
     }
-
+  
     const token = jwt.sign(
       {
-        email: loadedUser.email,
-        userId: loadedUser._id.toString()
+        email: user.email,
+        userId: user._id.toString()
       },
       JWT_SECRET,
       { expiresIn: '1h' }
@@ -75,13 +70,13 @@ exports.postLogin = (req, res, next) => {
       .status(200)
       .json({
         token: token,
-        userId: loadedUser._id.toString()
+        userId: user._id.toString()
       })
-  })
-  .catch(err => {
+
+  } catch (err) {
     if (!err.statusCode) {
-        err.statusCode = 500;
+      err.statusCode = 500;
     }
     next(err);
-  })
+  } 
 }
