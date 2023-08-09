@@ -5,6 +5,8 @@ const { validationResult } = require('express-validator');
 
 const Post = require('../models/post');
 const User = require('../models/user');
+const { getIO } = require('../socket');
+const user = require('../models/user');
 
 const clearImage = (filePath) => {
   filePath = path.join(path.dirname(path.dirname(__filename)), filePath);
@@ -22,9 +24,10 @@ exports.getPosts = async (req, res, next) => {
     const totalItems = await Post.find().countDocuments();
     const posts = await Post
       .find()
+      .populate('creator')
+      .sort({createdAt: -1})
       .skip((currentPage - 1) * perPage)
-      .limit(perPage)
-      .populate('creator');
+      .limit(perPage);
 
     return res.status(200).json({
       message: 'fetched posts',
@@ -67,12 +70,24 @@ exports.createPost = async (req, res, next) => {
     const user = await User.findById(req.userId);
     user.posts.push(post);
     await user.save();
+    
+    const postToSend = {
+      ...post._doc,
+      creator: {
+        _id: user._id,
+        name: user.name
+      }
+    }
+    getIO().emit('posts', {
+      action: 'create',
+      post: postToSend
+    });
 
     return res
       .status(201)
       .json({
         message: 'Post created successfully!',
-        post: post,
+        post: postToSend,
         creator: {
           _id: user._id,
           name: user.name
@@ -129,13 +144,13 @@ exports.updatePost = async (req, res, next) => {
       throw error;
     }
 
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId).populate('creator');
     if (!post) {
       const error = new Error("Could not find the post.");
       error.statusCode = 404;
       throw error;
     }
-    if (post.creator.toString() !== req.userId) {
+    if (post.creator._id.toString() !== req.userId) {
       const error = new Error("Not authorized.");
       error.statusCode = 403;
       throw error;
@@ -149,11 +164,24 @@ exports.updatePost = async (req, res, next) => {
     post.title = req.body.title;
     post.content = req.body.content;
     await post.save();
+
+    const postToSend = {
+      ...post._doc,
+      creator: {
+        _id: post.creator._id,
+        name: post.creator.name
+      }
+    }
+    getIO().emit('posts', {
+      action: 'update',
+      post: postToSend
+    });
+
     return res
       .status(200)
       .json({
         message: 'Post updated!',
-        post: post
+        post: postToSend
       })
 
   } catch (err) {
@@ -184,6 +212,11 @@ exports.deletePost = async (req, res, next) => {
     const user = await User.findById(req.userId);
     user.posts.pull(req.params.postId);
     await user.save();
+
+    getIO().emit('posts', {
+      action: 'delete',
+      post: {_id: req.params.postId}
+    });
     
     return res
       .status(200)

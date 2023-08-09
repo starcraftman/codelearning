@@ -10,6 +10,7 @@ const { v4: uuidv4 } = require('uuid');
 const feedRoutes = require('./routes/feed');
 const userRoutes = require('./routes/auth');
 const getSecret = require('./util/get-secret');
+const { initIO } = require('./socket');
 
 const app = express();
 const fileStorage = multer.diskStorage({
@@ -58,6 +59,10 @@ app.use((err, req, res, next) => {
 mongoose.connect(getSecret('dbUri'))
 .then(result => {
     console.log('Connected to mongodb successfully.')
-    app.listen(8080);
+    const server = app.listen(8080);
+    const io = initIO(server);
+    io.on('connection', socket => {
+        console.log('Client connected');
+    })
 })
 .catch(err => console.log(err));
