@@ -42,26 +42,27 @@ exports.getPosts = async (req, res, next) => {
 
 exports.createPost = async (req, res, next) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty() || !req.file) {
-    if (req.file) {
-      clearImage(req.file.path);
-    }
-    const error = new Error('Validation failed, invalid post data.');
-    error.statusCode = 422;
-    throw error;
-  }
-  
-  const title = req.body.title;
-  const content = req.body.content;
-  const imageUrl = req.file.path.replace('\\', '/');
-  const post = new Post({
-    title: title, 
-    content: content,
-    imageUrl: imageUrl,
-    creator: req.userId
-  })
 
   try {
+    if (!errors.isEmpty() || !req.file) {
+      if (req.file) {
+        clearImage(req.file.path);
+      }
+      const error = new Error('Validation failed, invalid post data.');
+      error.statusCode = 422;
+      throw error;
+    }
+    
+    const title = req.body.title;
+    const content = req.body.content;
+    const imageUrl = req.file.path.replace('\\', '/');
+    const post = new Post({
+      title: title, 
+      content: content,
+      imageUrl: imageUrl,
+      creator: req.userId
+    })
+    
     await post.save();
     const user = await User.findById(req.userId);
     user.posts.push(post);
@@ -220,13 +221,14 @@ exports.getStatus = async (req, res, next) => {
 
 exports.postStatus = async (req, res, next) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new Error('Invalid status sent.');
-    error.statusCode = 422;
-    throw error;
-  }
 
   try {
+    if (!errors.isEmpty()) {
+      const error = new Error('Invalid status sent.');
+      error.statusCode = 422;
+      throw error;
+    }
+  
     const user = await User.findById(req.userId);
     if (!user) {
       const error = new Error("Could not find user.");
