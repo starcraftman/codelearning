@@ -4,8 +4,44 @@ const vdr = require('validator');
 
 const Post = require('../models/post');
 const User = require('../models/user');
+const getSecret = require('../util/get-secret');
+
+const JWT_SECRET = getSecret('jwt');
+
 
 module.exports = {
+    login: async (args, req) => {
+        const email = vdr.normalizeEmail(vdr.trim(args.email));
+        const password = vdr.trim(args.password);
+      
+        const user = await User.findOne({email: email});
+        if (!user) {
+            const error = new Error("A user with email was not found.");
+            error.code = 401;
+            throw error;
+        }
+    
+        const isEqual = await bcrypt.compare(password, user.password);
+        if (!isEqual) {
+            const error = new Error("Password incorrect.");
+            error.code = 401;
+            throw error;
+        }
+    
+        const token = jwt.sign(
+            {
+                email: user.email,
+                userId: user._id.toString()
+            },
+            JWT_SECRET,
+            { expiresIn: '1h' }
+        )
+        return { 
+            token: token,
+            userId: user._id.toString()
+        }
+    },
+
     createUser: async (args, req) => {
         const email = vdr.normalizeEmail(vdr.trim(args.userInput.email));
         const password = vdr.trim(args.userInput.password);
@@ -22,7 +58,6 @@ module.exports = {
         if (errors.length > 0) {
             const error = new Error("Invalid arguments provided.");
             error.data = errors;
-            console.log(errors);
             error.code = 422;
             throw error;
         }
