@@ -42,14 +42,22 @@ module.exports = buildSchema(`
         posts: [Post!]!
     }
 
+    type SimpleResponse {
+        message: String!
+    }
+
     type RootQuery {
         login(email: String!, password: String!) : AuthData
-        getPosts: PostsData!
-        getPost(postId: String!): Post!
+        getPosts(page: Int!): PostsData!
+        getPost(postId: ID!): Post!
+        getUser: User!
     }
     type RootMutation {
         createUser(userInput: UserInputData): User!
         createPost(input: PostInputData): Post!
+        deletePost(postId: String!): SimpleResponse!
+        updatePost(postId: ID!, input: PostInputData!): Post!
+        setStatus(newStatus: String!): User!
     }
 
     schema {

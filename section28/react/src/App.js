@@ -62,9 +62,13 @@ class App extends Component {
     event.preventDefault();
     this.setState({ authLoading: true });
     const graphqlQuery = {
+      variables: {
+        email: authData.email,
+        password: authData.password
+      },
       query: `
-        {
-          login(email: "${authData.email}", password: "${authData.password}") {
+        query Login($email: String!, $password: String!) {
+          login(email: $email, password: $password) {
             token
             userId
           }
@@ -123,9 +127,19 @@ class App extends Component {
     const name = authData.signupForm.name.value
     const password = authData.signupForm.password.value
     const graphqlQuery = {
+      variables: {
+        email: email,
+        name: name,
+        password: password
+      },
       query: `
-        mutation {
-          createUser(userInput: {email: "${email}", name: "${name}", password: "${password}"}) {
+        mutation CreateUser($email: String!, $name: String!, $password: String!) {
+          createUser(
+            userInput: {
+              email: $email, 
+              name: $name, 
+              password: $password
+          }) {
             email
             status
             name

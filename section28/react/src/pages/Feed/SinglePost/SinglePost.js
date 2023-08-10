@@ -21,14 +21,17 @@ class SinglePost extends Component {
     let graphqlQuery = {
       query: `
       {
-        getPost(postId: ${postId}) {
-          posts {
-            title
-            _id
-            title
-            content
+        getPost(postId:  "${postId}") {
+          _id
+          title
+          content
+          imageUrl
+          creator {
+            name
+          }
+          createdAt
         }
-      }    
+      }
       `
     }
     fetch(`${SITE}/graphql`, {
@@ -43,15 +46,15 @@ class SinglePost extends Component {
         return res.json();
       })
       .then(resData => {
-        console.log(resData);
+        console.log('returned', resData);
         resData = resData.data.getPost;
         console.log('resdat', resData)
         this.setState({
-          title: resData.post.title,
-          author: resData.post.creator.name,
-          image: `${SITE}/${resData.post.imageUrl}`,
-          date: new Date(resData.post.createdAt).toLocaleDateString('en-US'),
-          content: resData.post.content
+          title: resData.title,
+          author: resData.creator.name,
+          image: `${SITE}/${resData.imageUrl}`,
+          date: new Date(resData.createdAt).toLocaleDateString('en-US'),
+          content: resData.content
         });
       })
       .catch(err => {

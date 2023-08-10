@@ -5,17 +5,7 @@ const { validationResult } = require('express-validator');
 
 const Post = require('../models/post');
 const User = require('../models/user');
-const { getIO } = require('../socket');
 const user = require('../models/user');
-
-const clearImage = (filePath) => {
-  filePath = path.join(path.dirname(path.dirname(__filename)), filePath);
-  fs.unlink(filePath, err => {
-    if (err) {
-      console.log('clearImage', err);
-    }
-  });
-}
 
 exports.getPosts = async (req, res, next) => {
   const currentPage = req.query.page || 1;
@@ -71,17 +61,17 @@ exports.createPost = async (req, res, next) => {
     user.posts.push(post);
     await user.save();
     
-    const postToSend = {
-      ...post._doc,
-      creator: {
-        _id: user._id,
-        name: user.name
-      }
-    }
-    getIO().emit('posts', {
-      action: 'create',
-      post: postToSend
-    });
+    // const postToSend = {
+    //   ...post._doc,
+    //   creator: {
+    //     _id: user._id,
+    //     name: user.name
+    //   }
+    // }
+    // getIO().emit('posts', {
+    //   action: 'create',
+    //   post: postToSend
+    // });
 
     return res
       .status(201)
@@ -165,17 +155,17 @@ exports.updatePost = async (req, res, next) => {
     post.content = req.body.content;
     await post.save();
 
-    const postToSend = {
-      ...post._doc,
-      creator: {
-        _id: post.creator._id,
-        name: post.creator.name
-      }
-    }
-    getIO().emit('posts', {
-      action: 'update',
-      post: postToSend
-    });
+    // const postToSend = {
+    //   ...post._doc,
+    //   creator: {
+    //     _id: post.creator._id,
+    //     name: post.creator.name
+    //   }
+    // }
+    // getIO().emit('posts', {
+    //   action: 'update',
+    //   post: postToSend
+    // });
 
     return res
       .status(200)
@@ -213,10 +203,10 @@ exports.deletePost = async (req, res, next) => {
     user.posts.pull(req.params.postId);
     await user.save();
 
-    getIO().emit('posts', {
-      action: 'delete',
-      post: {_id: req.params.postId}
-    });
+    // getIO().emit('posts', {
+    //   action: 'delete',
+    //   post: {_id: req.params.postId}
+    // });
     
     return res
       .status(200)

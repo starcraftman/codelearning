@@ -12,6 +12,7 @@ const getSecret = require('./util/get-secret');
 const graphqlResolvers = require('./graphql/resolvers')
 const graphqlSchema = require('./graphql/schema')
 const auth = require('./middleware/auth')
+const { clearImage } = require('./controllers/feed');
 
 const app = express();
 const fileStorage = multer.diskStorage({
@@ -58,6 +59,29 @@ app.use((err, req, res, next) => {
 })
 
 app.use(auth);
+
+app.put('/post-image', (req, res, next) => {
+    if (!req.isAuth) {
+        const error = new Error("Not authenticated!");
+        error.code = 401;
+        throw error;
+    }
+    if (!req.file) {
+        return res.status(200).json({
+            message: "No file provided."
+        })
+    }
+
+    if (req.body.oldPath) {
+        clearImage(req.body.oldPath);
+    }
+
+    return res.status(201).json({
+        message: "File stored",
+        filePath: req.file.path.replace('\\', '/')
+    })
+})
+
 app.use(
     '/graphql', 
     graphqlHTTP({
