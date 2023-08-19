@@ -1,3 +1,4 @@
+import Card from "./Card.js"
 import ExpenseItem from "./ExpenseItem";
 import "./Expenses.css";
 
@@ -8,7 +9,7 @@ function Expenses(props) {
     );
   });
 
-  return <div className="expenses">{expenseItems}</div>;
+  return <Card className="expenses">{expenseItems}</Card>;
 }
 
 export default Expenses;
