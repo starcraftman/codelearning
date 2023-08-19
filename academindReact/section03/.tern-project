@@ -1,0 +1,16 @@
+    {
+      "libs": [
+        "browser",
+        "jquery",
+        "react",
+        "react-dom",
+        "react-scripts",
+        "web-vitals"
+      ],
+      "plugins": {
+        "requirejs": {
+          "baseURL": "./",
+          "paths": {}
+        }
+      }
+    }
