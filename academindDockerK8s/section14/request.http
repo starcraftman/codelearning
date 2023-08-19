@@ -1,0 +1,71 @@
+POST http://192.168.49.2:32200/login
+Content-Type: application/json
+
+{
+    "email": "test@test.com",
+    "password": "testing"
+}
+####
+
+POST http://192.168.49.2:32200/signup
+Content-Type: application/json
+
+{
+    "email": "test@test.com",
+    "password": "testing"
+}
+####
+
+GET http://192.168.49.2:31710/tasks
+Authorization: Bearer abc
+
+####
+
+POST http://192.168.49.2:31710/tasks
+Authorization: Bearer abc
+Content-Type: application/json
+
+{
+    "title": "Task Title",
+    "text": "Task text"
+}
+####
+
+
+
+
+
+
+
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+    "email": "test@test.com",
+    "password": "testing"
+}
+####
+
+POST http://localhost:8080/signup
+Content-Type: application/json
+
+{
+    "email": "test@test.com",
+    "password": "testing"
+}
+####
+
+GET http://localhost:8000/tasks
+Authorization: Bearer abc
+
+####
+
+POST http://localhost:8000/tasks
+Authorization: Bearer abc
+Content-Type: application/json
+
+{
+    "title": "Task Title",
+    "text": "Task text"
+}
+####

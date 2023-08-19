@@ -1,0 +1,25 @@
+get http://localhost:8000/story
+
+#####
+POST http://localhost:8000/story HTTP/1.1
+content-type: application/json
+
+{
+    "text": "this is another line"
+}
+
+
+####
+GET  http://192.168.49.2:31454/story HTTP/1.1
+
+####
+GET  http://192.168.49.2:31454/error HTTP/1.1
+
+###
+
+POST  http://192.168.49.2:31454/story HTTP/1.1
+content-type: application/json
+
+{
+    "text": "this is another line"
+}

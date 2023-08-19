@@ -1,0 +1,34 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: story-deployment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: story
+  template:
+    metadata:
+      labels:
+        app: story
+    spec:
+      containers:
+      - name: story
+        image: starcraftman/k8:5
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        volumeMounts:
+          - mountPath: /app/story
+            name: story-volume
+        env:
+          - name: STORY_FOLDER
+            valueFrom: 
+              configMapKeyRef:
+                key: folder
+                name: data-store-env
+      volumes:
+        - name: story-volume
+          persistentVolumeClaim:
+            claimName: host-pvc      
