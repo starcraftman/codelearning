@@ -8,7 +8,7 @@ interface PropsType {
 };
 
 const NewExpense = (props: PropsType) => {
-    const [addNewClicked, setAddNewClicked] = React.useState(false);
+    const [isEditing, setIsEditing] = React.useState(false);
     const saveExpenseDataHandler = (enteredData: ExpenseItemType) => {
         const expenseData = {
             ...enteredData,
@@ -17,11 +17,11 @@ const NewExpense = (props: PropsType) => {
         props.onAddExpense(expenseData);
     }
 
-    const expenseButton = <button onClick={() => setAddNewClicked(true)}>Add New Expense</button>;
-    const expenseForm = <ExpenseForm resetForm={() => setAddNewClicked(false)} onSaveExpenseData={saveExpenseDataHandler}/>;
+    const expenseButton = <button onClick={() => setIsEditing(true)}>Add New Expense</button>;
+    const expenseForm = <ExpenseForm resetForm={() => setIsEditing(false)} onSaveExpenseData={saveExpenseDataHandler}/>;
     return (
         <div className="new-expense">
-            {addNewClicked ? expenseForm : expenseButton}
+            {isEditing ? expenseForm : expenseButton}
         </div>
     );
 };
