@@ -25,10 +25,15 @@ const expenses : ExpenseItemType[] = [
   },
 ];
 
+const addExpenseHandler = (expense: ExpenseItemType) => {
+  console.log('in app.tsx');
+  console.log(expense);
+};
+
 const App = () => {
   return (
     <div>
-      <NewExpense />
+      <NewExpense onAddExpense={addExpenseHandler} />
       <Expenses expenses={expenses} />
     </div>
   );

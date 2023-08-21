@@ -13,11 +13,10 @@ export interface PropsType {
 
 const ExpenseItem = (props: PropsType) => {
   const [title, setTitle] = useState(props.title)
-  console.log(title, setTitle);
 
   const clickHandler = () => {
     setTitle("Updated");
-    console.log("updated")
+    console.log("Updated the title")
   }
 
   return (
