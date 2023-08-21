@@ -6,6 +6,7 @@ import "./ExpenseItem.css";
 
 export interface PropsType {
   id?: string;
+  key?: string;
   amount: number;
   date: Date;
   title: string;

@@ -3,7 +3,7 @@ import Expenses from "./components/Expenses/Expenses";
 import { PropsType as ExpenseItemType } from "./components/Expenses/ExpenseItem";
 import NewExpense from "./components/NewExpense/NewExpense";
 
-const expenses : ExpenseItemType[] = [
+const DUMMY_EXPENSES : ExpenseItemType[] = [
   {
     id: "e1",
     title: "Toilet Paper",
@@ -25,12 +25,17 @@ const expenses : ExpenseItemType[] = [
   },
 ];
 
-const addExpenseHandler = (expense: ExpenseItemType) => {
-  console.log('in app.tsx');
-  console.log(expense);
-};
-
 const App = () => {
+  const [expenses, setExpenses] = React.useState(DUMMY_EXPENSES);
+
+  const addExpenseHandler = (expense: ExpenseItemType) => {
+    console.log('in app.tsx');
+    setExpenses((prevState: ExpenseItemType[]) => {
+      return [expense, ...expenses];
+    });
+  };
+
+
   return (
     <div>
       <NewExpense onAddExpense={addExpenseHandler} />

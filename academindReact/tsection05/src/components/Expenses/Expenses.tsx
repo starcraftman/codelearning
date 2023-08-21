@@ -11,15 +11,20 @@ export interface PropsType {
 };
 
 const Expenses = (props: PropsType) => {
-  const [filter, setFilter] = React.useState("2020");
+  const [filter, setFilter] = React.useState("");
+  const [filteredItems, setFilteredItems] = React.useState(props.expenses);
   const onFilterChangeHandler = (selectedYear: string) => {
     setFilter(selectedYear);
     console.log(`Expenses filter now set to  ${selectedYear}`);
+    const newFilteredItems = props.expenses.filter((item) => {
+        return item.date.getFullYear() === parseInt(selectedYear);
+    });
+    setFilteredItems(newFilteredItems);
   };
 
-  const expenseItems = props.expenses.map((exp: ExpenseItemProp) => {
+  const expenseItems = filteredItems.map((exp: ExpenseItemProp) => {
     return (
-      <ExpenseItem title={exp.title} amount={exp.amount} date={exp.date} />
+      <ExpenseItem key={exp.id} title={exp.title} amount={exp.amount} date={exp.date} />
     );
   });
 
