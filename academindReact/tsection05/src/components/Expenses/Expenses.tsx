@@ -11,27 +11,26 @@ export interface PropsType {
 };
 
 const Expenses = (props: PropsType) => {
-  const [filter, setFilter] = React.useState("");
-  const [filteredItems, setFilteredItems] = React.useState(props.expenses);
+  const [filteredYear, setFilteredYear] = React.useState("");
   const onFilterChangeHandler = (selectedYear: string) => {
-    setFilter(selectedYear);
+    setFilteredYear(selectedYear);
     console.log(`Expenses filter now set to  ${selectedYear}`);
-    const newFilteredItems = props.expenses.filter((item) => {
-        return item.date.getFullYear() === parseInt(selectedYear);
-    });
-    setFilteredItems(newFilteredItems);
   };
 
-  const expenseItems = filteredItems.map((exp: ExpenseItemProp) => {
-    return (
-      <ExpenseItem key={exp.id} title={exp.title} amount={exp.amount} date={exp.date} />
-    );
-  });
+  const expenseItems = props.expenses
+    .filter((item) => {
+      return item.date.getFullYear() !== parseInt(filteredYear);
+    })
+    .map((exp: ExpenseItemProp) => {
+      return (
+        <ExpenseItem key={exp.id} title={exp.title} amount={exp.amount} date={exp.date} />
+      );
+    });
 
   return (
     <div>
       <Card className="expenses">
-        <ExpenseFilter selected={filter} onFilterChange={onFilterChangeHandler}/>
+        <ExpenseFilter selected={filteredYear} onFilterChange={onFilterChangeHandler}/>
         {expenseItems}
       </Card>
     </div>
