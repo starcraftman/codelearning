@@ -4,7 +4,7 @@ import "./Card.css";
 
 interface PropsType {
   className: string;
-  children: any;
+  children: React.ReactNode;
 };
 
 const Card = (props: PropsType) => {

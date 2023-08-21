@@ -1,25 +1,27 @@
 import React from "react";
 import "./ExpenseForm.css";
+import { PropsType as ExpenseItemType } from "../Expenses/ExpenseItem";
 
 interface PropsType {
-    onSaveExpenseData?: any;
+    onSaveExpenseData: (expenseData: ExpenseItemType) => void;
+    resetForm: () => void;
 };
 
 const ExpenseForm = (props: PropsType) => {
     const [enteredTitle, setEnteredTitle] = React.useState("");
-    const titleChangeHandler = (event: any) : void => {
-        setEnteredTitle(event.target.value);
+    const titleChangeHandler = (event: React.ChangeEvent) : void => {
+        setEnteredTitle((event.target as HTMLInputElement).value);
         console.log('enteredTitle', enteredTitle);
     }
     const [enteredAmount, setEnteredAmount] = React.useState("");
-    const amountChangeHandler = (event: any) : void => {
-        setEnteredAmount(event.target.value);
+    const amountChangeHandler = (event: React.ChangeEvent) : void => {
+        setEnteredAmount((event.target as HTMLInputElement).value);
         console.log('enteredAmount', enteredAmount);
     }
 
     const [enteredDate, setEnteredDate] = React.useState("");
-    const dateChangeHandler = (event: any) : void => {
-        setEnteredDate(event.target.value);
+    const dateChangeHandler = (event: React.ChangeEvent) : void => {
+        setEnteredDate((event.target as HTMLInputElement).value);
         console.log('enteredDate', enteredDate);
     }
 
@@ -35,6 +37,12 @@ const ExpenseForm = (props: PropsType) => {
         setEnteredAmount("");
         // Bubble up data
         props.onSaveExpenseData(expenseData);
+        props.resetForm();
+    }
+
+    const cancelHandler = (event: React.FormEvent) => {
+        event.preventDefault();
+        props.resetForm();
     }
 
     return (
@@ -51,6 +59,9 @@ const ExpenseForm = (props: PropsType) => {
                 <div className="new-expense__control">
                     <label>Date</label>
                     <input onChange={dateChangeHandler} value= {enteredDate} type="date" min="2019-01-01" step="2022-12-31" />
+                </div>
+                <div className="new-expense__actions">
+                    <button onClick={cancelHandler}>Cancel</button>
                 </div>
                 <div className="new-expense__actions">
                     <button>Add Expense</button>

@@ -4,10 +4,11 @@ import ExpenseForm from "./ExpenseForm";
 import { PropsType as  ExpenseItemType } from "../Expenses/ExpenseItem";
 
 interface PropsType {
-    onAddExpense: any;
+    onAddExpense: (expenseData: ExpenseItemType) => void;
 };
 
 const NewExpense = (props: PropsType) => {
+    const [addNewClicked, setAddNewClicked] = React.useState(false);
     const saveExpenseDataHandler = (enteredData: ExpenseItemType) => {
         const expenseData = {
             ...enteredData,
@@ -16,9 +17,11 @@ const NewExpense = (props: PropsType) => {
         props.onAddExpense(expenseData);
     }
 
+    const expenseButton = <button onClick={() => setAddNewClicked(true)}>Add New Expense</button>;
+    const expenseForm = <ExpenseForm resetForm={() => setAddNewClicked(false)} onSaveExpenseData={saveExpenseDataHandler}/>;
     return (
         <div className="new-expense">
-            <ExpenseForm onSaveExpenseData={saveExpenseDataHandler}/>
+            {addNewClicked ? expenseForm : expenseButton}
         </div>
     );
 };
