@@ -1,13 +1,14 @@
 import React from "react";
 
 import Card from "./../UI/Card"
-import ExpenseItem, { PropsType as ExpenseItemProp } from "./ExpenseItem";
+import { PropsType as ExpenseItemType } from "./ExpenseItem";
 import ExpenseFilter from "./ExpenseFilter";
+import ExpensesList from "./ExpensesList";
 
 import "./Expenses.css";
 
 export interface PropsType {
-  expenses: ExpenseItemProp[]
+  expenses: ExpenseItemType[]
 };
 
 const Expenses = (props: PropsType) => {
@@ -17,25 +18,15 @@ const Expenses = (props: PropsType) => {
     console.log(`Expenses filter now set to  ${selectedYear}`);
   };
 
-  const expenseItems = props.expenses
-    .filter((item) => {
-      return item.date.getFullYear() === parseInt(filteredYear);
-    })
-    .map((exp: ExpenseItemProp) => {
-      return (
-        <ExpenseItem key={exp.id} title={exp.title} amount={exp.amount} date={exp.date} />
-      );
-    });
-  let expensesContent : any = <p>No items found!</p>;
-  if (expenseItems.length > 0) {
-    expensesContent = expenseItems;
-  }
+  const filteredExpenses = props.expenses.filter((item) => {
+    return item.date.getFullYear() === parseInt(filteredYear);
+  })
 
   return (
     <div>
       <Card className="expenses">
         <ExpenseFilter selected={filteredYear} onFilterChange={onFilterChangeHandler}/>
-        {expensesContent}
+        <ExpensesList items={filteredExpenses}/>
       </Card>
     </div>
   );
