@@ -1,5 +1,7 @@
 import React from "react";
 
+import style from "./Button.module.css"
+
 interface ButtonPropsType {
     children: string | number | React.ReactElement;
     className: string;
@@ -8,7 +10,7 @@ interface ButtonPropsType {
 
 const CalcForm = (props: ButtonPropsType) => {
     return (
-        <button onClick={props.onClick} type="submit" className={props.className}>
+        <button className={props.className === "button" ? style.button : style.buttonAlt} onClick={props.onClick} type="submit">
             {props.children}
         </button>
     );

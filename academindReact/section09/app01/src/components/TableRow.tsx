@@ -1,4 +1,3 @@
-
 import React from "react";
 
 export interface TableDataType {
@@ -12,15 +11,21 @@ interface PropsType {
     data: TableDataType;
     key: number;
 }
+const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
 const TableRow = (props: PropsType) => {
     return (
         <tr>
             <td>{props.data.year}</td>
-            <td>{"$" + props.data.totalSavings.toFixed(2)}</td>
-            <td>{"$" + props.data.yearlyInterest.toFixed(2)}</td>
-            <td>{"$" + props.data.totalInterest.toFixed(2)}</td>
-            <td>{"$" + (props.data.totalSavings - props.data.totalInterest).toFixed(2)}</td>
+            <td>{formatter.format(props.data.totalSavings)}</td>
+            <td>{formatter.format(props.data.yearlyInterest)}</td>
+            <td>{formatter.format(props.data.totalInterest)}</td>
+            <td>{formatter.format(props.data.totalSavings - props.data.totalInterest)}</td>
         </tr>
     );
 };
