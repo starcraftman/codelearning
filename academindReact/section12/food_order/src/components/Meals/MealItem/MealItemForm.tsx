@@ -5,6 +5,7 @@ import styles from "./MealItemForm.module.css";
 
 interface PropsType {
   id: string;
+  addToCartHandler: (amount: number) => void;
 };
 
 const MealItemForm = (props: PropsType) => {
@@ -16,9 +17,22 @@ const MealItemForm = (props: PropsType) => {
     step: "1",
     defaultValue: "1"
   };
+  const submitHandler = (event: React.FormEvent) => {
+    event.preventDefault();
+    const target = event.target as HTMLInputElement;
+    console.log(target.value);
+    const amount = parseInt(target.value);
+    console.log(amount, typeof amount);
+    if (Number.isNaN(amount) || amount < 1 || amount > 5) {
+      console.log("ERROR Adding");
+      return;
+    }
+
+    props.addToCartHandler(amount);
+  }
 
   return (
-    <form className={styles.form}>
+    <form onSubmit={submitHandler} className={styles.form}>
       <Input label="Amount" input={inputConfig} />
       <button>+Add</button>
     </form>

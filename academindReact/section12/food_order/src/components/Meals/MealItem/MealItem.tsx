@@ -22,6 +22,15 @@ const formatter = new Intl.NumberFormat("en-US", {
 });
 
 const MealItem = (props: PropsType) => {
+  const addToCart = (amount: number) => {
+    const item = {
+      id: props.meal.id,
+      name: props.meal.name,
+      price: props.meal.price,
+      amount: amount
+    }
+    console.log(item);
+  }
   return (
     <li className={styles.meal}>
       <div>
@@ -30,7 +39,7 @@ const MealItem = (props: PropsType) => {
         <div className={styles.price}>{formatter.format(props.meal.price)}</div>
       </div>
       <div>
-        <MealItemForm id={props.meal.id}/>
+        <MealItemForm addToCartHandler={addToCart} id={props.meal.id}/>
       </div>
     </li>
   );

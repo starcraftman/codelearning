@@ -3,7 +3,7 @@ import React from "react";
 import Modal from "../UI/Modal";
 import styles from "./Cart.module.css";
 
-interface CartItemType {
+export interface CartItemType {
   id: string;
   name: string;
   amount: number;
