@@ -18,8 +18,16 @@ interface CartProps {
 
 const Cart = (props: CartProps) => {
   const cartCtx = React.useContext(CartContext);
-  const onAddHandler = (item: CartItemType) => {};
-  const onRemoveHandler = (id: string) => {};
+  const onAddHandler = (item: CartItemType) => {
+    cartCtx.addItem({
+      ...item,
+      amount: 1
+    });
+
+  };
+  const onRemoveHandler = (id: string) => {
+    cartCtx.removeItem(id);
+  };
   const cartItems = cartCtx.items.map((item) => {
     return (
       <CartItem

@@ -21,14 +21,50 @@ const defaultCart = {
 const cartReducer = (state: typeof defaultCart, action: ActionType) => {
   if (action.type === "ADD") {
     const actItem = action.item!;
-    const updatedItems = state.items.concat(actItem);
     const updatedAmount = state.totalAmount + actItem.price;
+    const existingCartItem = state.items.find((item) => item.id === actItem.id);
+    const existingCartItemIndex = state.items.findIndex(item => item.id ===actItem.id);
+    let updatedItems: CartItemType[] = [];
+    if (existingCartItem) {
+      const updatedItem = {
+        ...existingCartItem,
+        amount: existingCartItem.amount + actItem.amount,
+      };
+      updatedItems = [
+        ...state.items
+      ];
+      updatedItems[existingCartItemIndex] = updatedItem;
+    } else {
+      updatedItems = state.items.concat(actItem);
+    }
+
     return {
       items: updatedItems,
       totalAmount: updatedAmount,
     };
+
   } else if (action.type === "REMOVE") {
+    const existingCartItem = state.items.find((item) => item.id === action.id);
+
+    if (existingCartItem) {
+      const updatedAmount = state.totalAmount - existingCartItem.price;
+      const otherItems = state.items.filter((item) => item.id !== existingCartItem.id)
+      let updatedItems;
+      if (existingCartItem.amount > 1) {
+        updatedItems = [
+          ...otherItems,
+          {...existingCartItem, amount: existingCartItem.amount - 1}
+        ]
+      } else {
+        updatedItems =  otherItems;
+      }
+      return {
+        items: updatedItems,
+        totalAmount: updatedAmount
+      }
+    }
   }
+
   return defaultCart;
 };
 
@@ -55,7 +91,7 @@ const CartProvider = (props: PropsType) => {
     },
     getTotal: () => {
       return formatMoney(cartState.totalAmount);
-    }
+    },
   };
 
   return (
