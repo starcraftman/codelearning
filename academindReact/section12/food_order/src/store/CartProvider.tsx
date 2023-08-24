@@ -22,9 +22,10 @@ const cartReducer = (state: typeof defaultCart, action: ActionType) => {
   if (action.type === "ADD") {
     const actItem = action.item!;
     const updatedAmount = state.totalAmount + actItem.price;
-    const existingCartItem = state.items.find((item) => item.id === actItem.id);
     const existingCartItemIndex = state.items.findIndex(item => item.id ===actItem.id);
+    const existingCartItem = state.items[existingCartItemIndex]
     let updatedItems: CartItemType[] = [];
+
     if (existingCartItem) {
       const updatedItem = {
         ...existingCartItem,
@@ -44,25 +45,29 @@ const cartReducer = (state: typeof defaultCart, action: ActionType) => {
     };
 
   } else if (action.type === "REMOVE") {
-    const existingCartItem = state.items.find((item) => item.id === action.id);
+    const existingCartItemIndex = state.items.findIndex(item => item.id === action.id);
+    const existingCartItem = state.items[existingCartItemIndex]
 
     if (existingCartItem) {
       const updatedAmount = state.totalAmount - existingCartItem.price;
       const otherItems = state.items.filter((item) => item.id !== existingCartItem.id)
-      let updatedItems;
+      let updatedItems: CartItemType[] = [];
+
       if (existingCartItem.amount > 1) {
-        updatedItems = [
-          ...otherItems,
-          {...existingCartItem, amount: existingCartItem.amount - 1}
-        ]
+        updatedItems = [...state.items];
+        updatedItems[existingCartItemIndex] = {...existingCartItem, amount: existingCartItem.amount - 1}
       } else {
         updatedItems =  otherItems;
       }
+
       return {
         items: updatedItems,
         totalAmount: updatedAmount
       }
     }
+
+  } else if (action.type === "CLEAR") {
+    return defaultCart;
   }
 
   return defaultCart;
@@ -84,6 +89,11 @@ const CartProvider = (props: PropsType) => {
       cartDispatch({
         type: "REMOVE",
         id: id,
+      });
+    },
+    clearCart: () => {
+      cartDispatch({
+        type: "CLEAR",
       });
     },
     getNumItems: () => {

@@ -40,6 +40,15 @@ const Cart = (props: CartProps) => {
   });
   const hasItems = cartCtx.items.length > 0;
 
+  const orderHandler = () => {
+    console.log("Order placed for: ", cartCtx.items);
+  }
+
+  const clearHandler = () => {
+    cartCtx.clearCart();
+    props.onClose();
+  }
+
   return (
     <Modal onClose={props.onClose}>
       <ul className={styles['cart-items']}>
@@ -53,7 +62,8 @@ const Cart = (props: CartProps) => {
         <button onClick={props.onClose} className={styles["button--alt"]}>
           Close
         </button>
-        {hasItems && <button className={styles.button}>Order</button>}
+        {hasItems && <button onClick={clearHandler} className={styles["button--alt"]}>Clear</button>}
+        {hasItems && <button onClick={orderHandler} className={styles.button}>Order</button> }
       </div>
     </Modal>
   );

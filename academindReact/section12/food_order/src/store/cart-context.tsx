@@ -11,6 +11,9 @@ const DEFAULT_CONTEXT = {
   removeItem: (id: string): void => {
     throw new Error("Default context should not be used.");
   },
+  clearCart: (): void => {
+    throw new Error("Default context should not be used.");
+  },
   getNumItems: (): number => {
     throw new Error("Default context should not be used.");
   },
