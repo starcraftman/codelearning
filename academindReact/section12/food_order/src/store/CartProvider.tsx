@@ -2,6 +2,7 @@ import React from "react";
 
 import CartContext from "./cart-context";
 import { CartItemType } from "../components/Cart/Cart";
+import { formatMoney } from "../util";
 
 interface PropsType {
   children: string | number | React.ReactNode | React.ReactNode[];
@@ -52,6 +53,9 @@ const CartProvider = (props: PropsType) => {
     getNumItems: () => {
       return cartState.items.reduce((accu, item) => accu + item.amount, 0);
     },
+    getTotal: () => {
+      return formatMoney(cartState.totalAmount);
+    }
   };
 
   return (

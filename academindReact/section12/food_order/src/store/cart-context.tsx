@@ -14,6 +14,9 @@ const DEFAULT_CONTEXT = {
   getNumItems: (): number => {
     throw new Error("Default context should not be used.");
   },
+  getTotal: (): string => {
+    throw new Error("Default context should not be used.");
+  },
 };
 const CartContext = React.createContext(DEFAULT_CONTEXT);
 
