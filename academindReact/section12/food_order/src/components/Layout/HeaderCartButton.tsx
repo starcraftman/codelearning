@@ -7,7 +7,7 @@ interface PropsType {}
 
 const HeaderCartButton = (props: PropsType) => {
   return (
-    <button type="button" className={styles.button}>
+    <button className={styles.button}>
         <span className={styles.icon}>
             <CartIcon />
         </span>
