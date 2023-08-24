@@ -2,6 +2,7 @@ import React from "react";
 
 import styles from "./MealItem.module.css";
 import MealItemForm from "./MealItemForm";
+import CartContext from "../../../store/cart-context";
 
 export interface MealItemType {
   id: string;
@@ -22,14 +23,16 @@ const formatter = new Intl.NumberFormat("en-US", {
 });
 
 const MealItem = (props: PropsType) => {
+  const cartCtx = React.useContext(CartContext);
   const addToCart = (amount: number) => {
-    const item = {
+    console.log('addToCart', amount);
+    console.log(cartCtx);
+    cartCtx.addItem({
       id: props.meal.id,
       name: props.meal.name,
       price: props.meal.price,
       amount: amount
-    }
-    console.log(item);
+    })
   }
   return (
     <li className={styles.meal}>
@@ -39,7 +42,7 @@ const MealItem = (props: PropsType) => {
         <div className={styles.price}>{formatter.format(props.meal.price)}</div>
       </div>
       <div>
-        <MealItemForm addToCartHandler={addToCart} id={props.meal.id}/>
+        <MealItemForm onAddToCart={addToCart} id={props.meal.id}/>
       </div>
     </li>
   );

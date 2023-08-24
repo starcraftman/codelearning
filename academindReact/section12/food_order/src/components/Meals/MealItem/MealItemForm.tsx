@@ -5,10 +5,12 @@ import styles from "./MealItemForm.module.css";
 
 interface PropsType {
   id: string;
-  addToCartHandler: (amount: number) => void;
+  onAddToCart: (amount: number) => void;
 };
 
 const MealItemForm = (props: PropsType) => {
+  const [amountValid, setAmountValid] = React.useState(true);
+  const inputRef = React.useRef();
   const inputConfig: InputType = {
     id: `amount ${props.id}`,
     type: "number",
@@ -19,22 +21,23 @@ const MealItemForm = (props: PropsType) => {
   };
   const submitHandler = (event: React.FormEvent) => {
     event.preventDefault();
-    const target = event.target as HTMLInputElement;
-    console.log(target.value);
-    const amount = parseInt(target.value);
-    console.log(amount, typeof amount);
+
+    const inputTarget = inputRef.current! as HTMLInputElement;
+    const amount = parseInt(inputTarget.value);
     if (Number.isNaN(amount) || amount < 1 || amount > 5) {
       console.log("ERROR Adding");
-      return;
+      setAmountValid(false);
     }
 
-    props.addToCartHandler(amount);
+    setAmountValid(true);
+    props.onAddToCart(amount);
   }
 
   return (
     <form onSubmit={submitHandler} className={styles.form}>
-      <Input label="Amount" input={inputConfig} />
+      <Input ref={inputRef} label="Amount" input={inputConfig} />
       <button>+Add</button>
+      {!amountValid && <p>Please enter a valid number 1...5</p>}
     </form>
   );
 };
