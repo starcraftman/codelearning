@@ -1,15 +1,15 @@
 import React from "react";
 
-const useHttp = (url, requestConfig, handleData) => {
+const useHttp = () => {
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState(null);
 
-    const sendRequest = React.useCallback(async () => {
+    const sendRequest = React.useCallback(async (requestConfig, handleData) => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const response = await fetch(url, requestConfig);
+        const response = await fetch(requestConfig.url, requestConfig);
         if (!response.ok) {
           throw new Error('Request failed!');
         }
@@ -20,7 +20,7 @@ const useHttp = (url, requestConfig, handleData) => {
       } finally{
         setIsLoading(false);
       }
-    }, [url, requestConfig, handleData]);
+    }, []);
 
   return  {
     isLoading,

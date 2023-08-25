@@ -5,21 +5,22 @@ import NewTask from './components/NewTask/NewTask';
 import useHttp from "./hooks/fetch-hook.js";
 
 const url = 'https://react-http-51865-default-rtdb.firebaseio.com/tasks.json';
-const requestConfig = {method: "GET"};
+const requestConfig = {url: url, method: "GET"};
 
 function App() {
   const [tasks, setTasks] = useState([]);
-  const transformTasks = React.useCallback((data) => {
-    const loadedTasks = [];
-    for (const taskKey in data) {
-      loadedTasks.push({ id: taskKey, text: data[taskKey].text });
-    }
-    setTasks(loadedTasks);
-  }, [])
+  const { isLoading, error, sendRequest: fetchTasks } = useHttp();
 
-  const { isLoading, error, sendRequest: fetchTasks } = useHttp(url, requestConfig, transformTasks);
   useEffect(() => {
-    fetchTasks();
+    const transformTasks = (data) => {
+      const loadedTasks = [];
+      for (const taskKey in data) {
+        loadedTasks.push({ id: taskKey, text: data[taskKey].text });
+      }
+      setTasks(loadedTasks);
+    }
+
+    fetchTasks(requestConfig, transformTasks);
   }, [fetchTasks]);
 
   const taskAddHandler = (task) => {
