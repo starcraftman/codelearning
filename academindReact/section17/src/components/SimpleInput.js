@@ -1,58 +1,56 @@
 import React from "react";
 
-const SimpleInput = (props) => {
-  const [enteredName, setEnteredName] = React.useState("");
-  const [nameValid, setNameValid] = React.useState(false);
-  const [nameTouched, setNameTouched] = React.useState(false);
+import useInput from "../hooks/use-input";
 
-  const nameChangeHandler = (event) => {
-    setNameTouched(true);
-    if (event.target.value.trim() !== "") {
-      setNameValid(true);
-    }
-    setEnteredName(event.target.value);
-  };
+const validateEmail = (email) => {
+  return email.indexOf("@") !== -1 && email.endsWith(".com");
+};
+
+const validateName = (name) => {
+  return name.trim() !== "";
+}
+
+const SimpleInput = (props) => {
+  const nameField = useInput(validateName);
+  const emailField = useInput(validateEmail);
+  const formIsValid = nameField.isValid && emailField.isValid;
 
   const formSubmitHandler = (event) => {
     event.preventDefault();
-    if (enteredName.trim() === "") {
-      setNameValid(false);
-      setNameTouched(true);
+
+    if (!nameField.isValid) {
       return;
     }
-    setNameValid(true);
-    console.log("Entered", enteredName);
+    nameField.reset();
+    emailField.reset();
   };
 
-  const onBlurHandler = (event) => {
-    setNameTouched(true);
-    if (enteredName.trim() === "") {
-      setNameValid(false);
-    }
-  }
-
-  React.useEffect(() => {
-    if (nameValid) {
-      console.log("Name input is valid.");
-    }
-  }, [nameValid]);
-
-  const nameInError = !nameValid && nameTouched;
-  const nameInputClasses = `form-control ${nameInError ? "invalid" : ""}`;
   return (
     <form onSubmit={formSubmitHandler}>
-      <div className={nameInputClasses}>
+      <div className={`form-control ${nameField.hasError ? "invalid" : ""}`}>
         <label htmlFor="name">Your Name</label>
         <input
+          value={nameField.value}
           type="text"
           id="name"
-          onChange={nameChangeHandler}
-          onBlur={onBlurHandler}
+          onChange={nameField.changeHandler}
+          onBlur={nameField.inputBlurHandler}
         />
-        {nameInError && <p className="error-text">Name must not be empty.</p>}
+        {nameField.hasError && <p className="error-text">Name must not be empty.</p>}
+      </div>
+      <div className={`form-control ${emailField.hasError ? "invalid" : ""}`}>
+        <label htmlFor="email">Your Email</label>
+        <input
+          value={emailField.value}
+          type="text"
+          id="email"
+          onChange={emailField.changeHandler}
+          onBlur={emailField.inputBlurHandler}
+        />
+        {emailField.hasError && <p className="error-text">Check email please.</p>}
       </div>
       <div className="form-actions">
-        <button>Submit</button>
+        <button disabled={!formIsValid}>Submit</button>
       </div>
     </form>
   );
