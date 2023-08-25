@@ -9,32 +9,49 @@ const requestConfig = {
   method: "GET",
 }
 
+interface MealData {
+  name: MealItemType
+};
 const AvailableMeals = () => {
-  const [allMeals, setAllMeals] = React.useState([] as any[]);
+  const [allMeals, setAllMeals] = React.useState([] as React.ReactNode[]);
   const { isLoading, error, sendRequest: getMeals } = useHttp();
 
   React.useEffect(() => {
-    const processMeals = (data: any) => {
+    const processMeals = (data: MealData) => {
       console.log('data response', data);  // FIXME: Why two fetches?
-      let allMeals = [];
-      for (const [mealId, mealItem] of Object.entries(data)) {
-        allMeals.push(<MealItem key={mealId} meal={mealItem as MealItemType} />)
-      }
+      const allMeals = Object.entries(data).map(([mealId, mealItem]) => {
+        mealItem.id = mealId;
+        return <MealItem key={mealId} meal={mealItem} />
+      });
       setAllMeals(allMeals);
     }
 
     getMeals(requestConfig, processMeals);
    }, [getMeals]);
 
-  return (
-    <section className={styles.meals}>
-      <Card>
-        {!isLoading && allMeals.length === 0 && <p>No meals available at this time.</p>}
-        {isLoading && <p>Fetching the available meals.</p>}
-        {!isLoading && !error && <ul>{allMeals}</ul>}
-      </Card>
-    </section>
+  let mealsContent = (
+      <section className={styles.meals}>
+        <Card>
+          <ul>{allMeals}</ul>;
+        </Card>
+      </section>
   );
-};
+
+  if (isLoading) {
+    mealsContent = (
+      <section className={styles['meals-loading']}>
+        <p>Loading ...</p>
+      </section>
+    )
+  } else if (error) {
+    mealsContent = (
+      <section className={styles['meals-error']}>
+        <p>Problem retrieving menu: {error}</p>
+      </section>
+    )
+  }
+
+  return mealsContent;
+}
 
 export default AvailableMeals;
