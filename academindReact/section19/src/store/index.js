@@ -1,18 +1,26 @@
 import { createStore } from "redux";
 
 const defaultState = {
-    counter: 0
+    counter: 0,
+    showCounter: true
 };
 const reducer = (prevState, action) => {
     console.log('act', action);
     if (action.type === "inc") {
         return {
-            counter: prevState.counter + 1,
+            ...prevState,
+            counter: prevState.counter + (action.amt ? action.amt : 1),
         }
     } else if (action.type === "dec") {
         return {
-            counter: prevState.counter - 1,
-        } 
+            ...prevState,
+            counter: prevState.counter - (action.amt ? action.amt : 1),
+        }
+    } else if (action.type === "toggle") {
+        return {
+            ...prevState,
+            showCounter: !prevState.showCounter
+        }
     }
 
     return defaultState;
