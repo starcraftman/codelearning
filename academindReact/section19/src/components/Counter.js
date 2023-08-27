@@ -26,6 +26,11 @@ const Counter = () => {
       type: 'dec'
     })
   }
+  const resetCounterHandler = () => {
+    dispatch({
+      type: 'reset'
+    })
+  }
 
   return (
     <main className={classes.counter}>
@@ -37,6 +42,7 @@ const Counter = () => {
         <button onClick={decHandler}>Dec</button>
       </div>
       <button onClick={toggleCounterHandler}>Toggle Counter</button>
+      <button onClick={resetCounterHandler}>Reset</button>
     </main>
   );
 };

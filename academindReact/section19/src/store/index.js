@@ -21,6 +21,11 @@ const reducer = (prevState, action) => {
             ...prevState,
             showCounter: !prevState.showCounter
         }
+    } else if (action.type === "reset") {
+        return {
+            ...prevState,
+            counter: 0
+        }
     }
 
     return defaultState;
