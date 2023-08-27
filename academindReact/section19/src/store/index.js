@@ -1,38 +1,14 @@
-import { createSlice, configureStore } from "@reduxjs/toolkit";
-
-const defaultState = {
-    counter: 0,
-    showCounter: true
-};
-
-const counterSlice = createSlice({
-    name: 'counter',
-    initialState: defaultState,
-    reducers: {
-        increment(state, action) {
-            console.log(action);
-            state.counter = state.counter + (action.payload ? action.payload.amt : 1);
-        },
-        decrement(state, action) {
-            state.counter = state.counter - (action.payload ? action.payload.amt : 1);
-        },
-        toggle(state) {
-            state.showCounter = !state.showCounter;
-        },
-        reset(state) {
-            state.counter = 0;
-        },
-    }
-})
-
-
-
+import { configureStore } from "@reduxjs/toolkit";
+import { counterReducer } from "./counter-slice";
+import { authReducer } from "./auth-slice"
+// Means to re-export an import, bit odd
+export { counterActions } from "./counter-slice";
+export { authActions } from "./auth-slice"
 const store = configureStore({
     // Method for merging many reducers
     reducer: {
-        counter: counterSlice.reducer
+        counter: counterReducer,
+        auth: authReducer
     }
 });
 export default store;
-
-export const counterActions = counterSlice.actions;
