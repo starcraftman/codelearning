@@ -1,13 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-
-import uiSlice from "./ui-slice"
-import cartSlice from "./cart-slice";
+import { cartReducer } from "./cart-slice"
+import { uiReducer } from "./ui-slice";
 
 const store = configureStore({
+    // Method for merging many reducers
     reducer: {
-        cart: cartSlice.reducer,
-        ui: uiSlice.reducer
+        cart: cartReducer,
+        ui: uiReducer
     }
-})
-
+});
 export default store;
