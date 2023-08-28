@@ -1,15 +1,24 @@
-import classes from './MainNavigation.module.css';
+import { NavLink } from "react-router-dom";
+
+import styles from "./MainNavigation.module.css";
 
 function MainNavigation() {
+  function isActiveHandler({ isActive }) {
+    return isActive ? styles.active : "";
+  }
   return (
-    <header className={classes.header}>
+    <header className={styles.header}>
       <nav>
-        <ul className={classes.list}>
+        <ul className={styles.list}>
           <li>
-            <a>Home</a>
+            <NavLink className={isActiveHandler} to="/" end>
+              Home
+            </NavLink>
           </li>
           <li>
-            <a>Events</a>
+            <NavLink className={isActiveHandler} to="/events">
+              Events
+            </NavLink>
           </li>
         </ul>
       </nav>
