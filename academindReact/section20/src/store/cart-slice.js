@@ -31,6 +31,9 @@ const cartSlice = createSlice({
             } else {
                 state.items = state.items.filter((item) => item.id !== itemId)
             }
+        },
+        replaceCart(state, action) {
+            state.items = action.payload.items;
         }
     }
 })
