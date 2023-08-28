@@ -23,6 +23,16 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <EventsPage />,
+            loader: async () => {
+              const response = await fetch('http://localhost:8080/events');
+
+              if (!response.ok) {
+                // TODO
+              } else {
+                const resData = await response.json()
+                return resData.events;
+              }
+            }
           },
           {
             path: "new",
