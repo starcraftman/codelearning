@@ -17,8 +17,9 @@ export async function action({request, params}) {
             description: formData.get('description'),
         })
     })
-
-    if (!response.ok) {
+    if (response.status == 422) {
+        return response;
+    } else if (!response.ok) {
         return json(null, {'status': 500, statusText: "Could not save event."});
     } else {
         const data = await response.json();

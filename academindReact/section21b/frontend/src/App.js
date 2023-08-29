@@ -2,7 +2,10 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HomePage from "./pages/Home";
 import NewEventPage, { action as newEventAction } from "./pages/NewEvent";
 import EditEventPage from "./pages/EditEvent";
-import EventDetailPage, { loader as eventDetailsLoader } from "./pages/EventDetail";
+import EventDetailPage, {
+  loader as eventDetailsLoader,
+  action as eventDetailAction,
+} from "./pages/EventDetail";
 import EventsPage, { loader as eventsPageLoader } from "./pages/Events";
 import RootLayout from "./pages/RootLayout";
 import EventsRootLayout from "./pages/EventsRootLayout";
@@ -25,12 +28,12 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <EventsPage />,
-            loader: eventsPageLoader
+            loader: eventsPageLoader,
           },
           {
             path: "new",
             element: <NewEventPage />,
-            action: newEventAction
+            action: newEventAction,
           },
           // Issue using child creation method of 330 ???
           {
@@ -41,13 +44,14 @@ const router = createBrowserRouter([
               {
                 index: true,
                 element: <EventDetailPage />,
+                action: eventDetailAction,
               },
               {
                 path: "edit",
                 element: <EditEventPage />,
               },
-            ]
-          }
+            ],
+          },
         ],
       },
     ],
