@@ -1,8 +1,8 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HomePage from "./pages/Home";
-import NewEventPage from "./pages/NewEvent";
+import NewEventPage, { action as newEventAction } from "./pages/NewEvent";
 import EditEventPage from "./pages/EditEvent";
-import EventDetailPage from "./pages/EventDetail";
+import EventDetailPage, { loader as eventDetailsLoader } from "./pages/EventDetail";
 import EventsPage, { loader as eventsPageLoader } from "./pages/Events";
 import RootLayout from "./pages/RootLayout";
 import EventsRootLayout from "./pages/EventsRootLayout";
@@ -30,15 +30,24 @@ const router = createBrowserRouter([
           {
             path: "new",
             element: <NewEventPage />,
+            action: newEventAction
           },
+          // Issue using child creation method of 330 ???
           {
             path: ":eventId",
-            element: <EventDetailPage />,
-          },
-          {
-            path: ":eventId/edit",
-            element: <EditEventPage />,
-          },
+            id: "event-details",
+            loader: eventDetailsLoader,
+            children: [
+              {
+                index: true,
+                element: <EventDetailPage />,
+              },
+              {
+                path: "edit",
+                element: <EditEventPage />,
+              },
+            ]
+          }
         ],
       },
     ],
