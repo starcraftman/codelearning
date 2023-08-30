@@ -2,6 +2,7 @@ import classes from "./EventsList.module.css";
 import { Link } from "react-router-dom";
 
 function EventsList({ events }) {
+  console.log('loaded', events)
 
   return (
     <div className={classes.events}>
