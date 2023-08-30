@@ -1,27 +1,47 @@
-import { NavLink } from "react-router-dom";
+import { NavLink } from 'react-router-dom';
 
-import styles from "./MainNavigation.module.css";
+import classes from './MainNavigation.module.css';
+import NewsletterSignup from './NewsletterSignup';
 
 function MainNavigation() {
-  function isActiveHandler({ isActive }) {
-    return isActive ? styles.active : "";
-  }
   return (
-    <header className={styles.header}>
+    <header className={classes.header}>
       <nav>
-        <ul className={styles.list}>
+        <ul className={classes.list}>
           <li>
-            <NavLink className={isActiveHandler} to="/" end>
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive ? classes.active : undefined
+              }
+              end
+            >
               Home
             </NavLink>
           </li>
           <li>
-            <NavLink className={isActiveHandler} to="/events">
+            <NavLink
+              to="/events"
+              className={({ isActive }) =>
+                isActive ? classes.active : undefined
+              }
+            >
               Events
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/newsletter"
+              className={({ isActive }) =>
+                isActive ? classes.active : undefined
+              }
+            >
+              Newsletter
             </NavLink>
           </li>
         </ul>
       </nav>
+      <NewsletterSignup />
     </header>
   );
 }
