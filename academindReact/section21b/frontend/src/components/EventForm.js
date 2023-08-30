@@ -1,7 +1,40 @@
 import { useNavigate, Form, useNavigation, useActionData } from "react-router-dom";
 
 import classes from "./EventForm.module.css";
-import { action } from "../pages/NewEvent";
+
+import { json, redirect } from "react-router-dom";
+
+export async function action({request, params}) {
+    const formData = await request.formData();
+    let url = "http://localhost:8080/events";
+    if (request.method === "PATCH") {
+      url = `http://localhost:8080/events/${params.eventId}`;
+    }
+    
+    const response = await fetch(url,
+    {
+        method: request.method,
+        headers: {
+            'Content-Type': "application/json"
+        },
+        body: JSON.stringify({
+            title: formData.get('title'),
+            image: formData.get('image'),
+            date: formData.get('date'),
+            description: formData.get('description'),
+        })
+    })
+    if (response.status == 422) {
+        return response;
+    } else if (!response.ok) {
+        return json(null, {'status': 500, statusText: "Could not save event."});
+    } else {
+        const data = await response.json();
+        console.log('add event response', data);
+        return redirect("/events");
+
+    }
+}
 
 function EventForm({ method, event }) {
   const actionData = useActionData();
@@ -24,7 +57,7 @@ function EventForm({ method, event }) {
   console.log('errors', errorsLine, actionData)
 
   return (
-    <Form method="POST" className={classes.form}>
+    <Form method={method} className={classes.form}>
       {errorsLine}
       <p>
         <label htmlFor="title">Title</label>
