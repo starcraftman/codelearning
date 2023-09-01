@@ -11,27 +11,26 @@ function AutoBind(_: any, _2: string, descriptor: PropertyDescriptor) {
     return adjDescriptor;
 };
 
-interface Project {
+enum ProjectStatus { Active, Finished };
+class Project {
     id: string;
-    title: string;
-    description: string;
-    people: number;
+
+    constructor(public title: string, public description: string, public people: number, public status: ProjectStatus) {
+        this.id = Math.random().toString();
+    }
 }
+
+type Listener = (projects: Project[]) => void;
 class ProjectState {
     private projects: Project[] = [];
     private static instance: ProjectState;
-    private listeners: any[] = [];
+    private listeners: Listener[] = [];
 
     private constructor() {
     }
 
     addProject(title: string, description: string, people: number) {
-        const newProject = {
-            id: Math.random().toString(),
-            title,
-            description,
-            people
-        }
+        const newProject = new Project(title, description, people, ProjectStatus.Active);
         this.projects.push(newProject);
         for (const listen of this.listeners) {
             listen(this.projects.slice());
@@ -46,7 +45,7 @@ class ProjectState {
         return this.instance;
     }
 
-    addListener(listerFn: Function) {
+    addListener(listerFn: Listener) {
         this.listeners.push(listerFn);
     }
 }
@@ -118,9 +117,9 @@ class ProjectList {
 
     private renderProjects() {
         const listEl = document.getElementById(`${this.type}-projects-list`);
-        this.assignedProjects.forEach(x => {
+        this.assignedProjects.forEach(prj => {
             const listItem = document.createElement('li');
-            listItem.textContent = x.title;
+            listItem.textContent = prj.title;
             listEl?.appendChild(listItem);
         })
     }
