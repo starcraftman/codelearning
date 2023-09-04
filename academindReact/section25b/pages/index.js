@@ -42,4 +42,13 @@ export async function getStaticProps() {
     }
 };
 
+// export async function getServerSideProps(context) {
+//     console.log(context.req, context.res);
+//     return {
+//         props: {
+//             meetups: DUMMY_MEETUPS,
+//         }
+//     }
+// };
+
 export default HomePage;
