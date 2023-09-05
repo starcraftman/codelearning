@@ -1,10 +1,17 @@
 import MeetupDetail from "../../components/meetups/MeetupDetail";
 import { getDbClient } from "../../util/secrets";
 import { ObjectId } from "mongodb";
+import Head from "next/head";
 
 const MeetupDetails = (props) => {
-  console.log(props.meetup);
-  return <MeetupDetail {...props.meetup} />;
+  console.log('hello', props.meetup);
+  return <>
+    <Head>
+      <title>{props.meetup.title}</title>
+      <meta name="description" content={props.meetup.description} />
+    </Head>
+    <MeetupDetail {...props.meetup} />;
+  </>
 };
 
 export async function getStaticPaths() {
@@ -22,7 +29,7 @@ export async function getStaticPaths() {
       });
       return {
         paths: paths,
-        fallback: false
+        fallback: 'blocking'
       }
 
   } finally {
