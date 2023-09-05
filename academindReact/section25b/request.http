@@ -1,0 +1,9 @@
+POST http://localhost:3000/api/new-meetup
+Content-Type: "application/json"
+
+{
+    "title": "Testing",
+    "image": "https://images.nationalgeographic.org/image/upload/t_edhub_resource_key_image/v1638884690/EducationHub/photos/bengali-village.jpg",
+    "address": "Some address",
+    "description": "Some description"
+}
