@@ -1,4 +1,7 @@
+import { QueryClient } from "@tanstack/react-query";
+
 const URL = `http://localhost:3000/events`;
+export const queryClient = new QueryClient();
 
 export async function fetchEvents({ signal, searchTerm }) {
   const suffix = searchTerm ? `?search=${searchTerm}` : "";
@@ -26,7 +29,7 @@ export async function createNewEvent(eventData) {
   });
 
   if (!response.ok) {
-    const error = new Error("An error occurred while fetching the events");
+    const error = new Error("An error occurred while submitting a new event");
     error.code = response.status;
     error.info = await response.json();
     throw error;
@@ -35,3 +38,48 @@ export async function createNewEvent(eventData) {
   const { event } = await response.json();
   return event;
 }
+
+export async function fetchSelectableImages({ signal }) {
+    const response = await fetch(`${URL}/images`, {signal: signal});
+    
+      if (!response.ok) {
+        const error = new Error("An error occurred while fetching the images");
+        error.code = response.status;
+        error.info = await response.json();
+        throw error;
+      }
+    
+      const { images } = await response.json();
+      return images;
+}
+
+export async function fetchEvent({ id, signal }) {
+    const response = await fetch(`${URL}/${id}`, { signal });
+  
+    if (!response.ok) {
+      const error = new Error('An error occurred while fetching the event');
+      error.code = response.status;
+      error.info = await response.json();
+      throw error;
+    }
+  
+    const { event } = await response.json();
+  
+    return event;
+  }
+  
+  
+  export async function deleteEvent({ id }) {
+    const response = await fetch(`${URL}/${id}`, {
+      method: 'DELETE',
+    });
+  
+    if (!response.ok) {
+      const error = new Error('An error occurred while deleting the event');
+      error.code = response.status;
+      error.info = await response.json();
+      throw error;
+    }
+  
+    return response.json();
+  }
