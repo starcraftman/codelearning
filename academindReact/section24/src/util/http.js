@@ -3,8 +3,15 @@ import { QueryClient } from "@tanstack/react-query";
 const URL = `http://localhost:3000/events`;
 export const queryClient = new QueryClient();
 
-export async function fetchEvents({ signal, searchTerm }) {
-  const suffix = searchTerm ? `?search=${searchTerm}` : "";
+export async function fetchEvents({ signal, searchTerm, max}) {
+  let suffix;
+  if (searchTerm && max) {
+    suffix = `?search=${searchTerm}&max=${max}`
+  } else if (searchTerm) {
+    suffix = `?search=${searchTerm}`
+  } else if (max) {
+    suffix = `?max=${max}`
+  }
   const response = await fetch(URL + suffix, { signal: signal });
 
   if (!response.ok) {
@@ -76,6 +83,25 @@ export async function fetchEvent({ id, signal }) {
   
     if (!response.ok) {
       const error = new Error('An error occurred while deleting the event');
+      error.code = response.status;
+      error.info = await response.json();
+      throw error;
+    }
+  
+    return response.json();
+  }
+
+  export async function updateEvent({ id, event }) {
+    const response = await fetch(`${URL}/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ event }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  
+    if (!response.ok) {
+      const error = new Error('An error occurred while updating the event');
       error.code = response.status;
       error.info = await response.json();
       throw error;

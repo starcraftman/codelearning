@@ -7,8 +7,8 @@ import EventItem from "./EventItem.jsx";
 
 export default function NewEventsSection() {
   const query = useQuery({
-    queryKey: ["events"],
-    queryFn: fetchEvents,
+    queryKey: ["events", {max: 3}],
+    queryFn: ({ signal, queryKey }) => fetchEvents({ signal, ...queryKey[1]}),
     staleTime: 5000, // Time before new fetch after getting attention
   });
   let content;
