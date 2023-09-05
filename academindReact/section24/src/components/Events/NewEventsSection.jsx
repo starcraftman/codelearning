@@ -9,6 +9,7 @@ export default function NewEventsSection() {
   const query = useQuery({
     queryKey: ["events"],
     queryFn: fetchEvents,
+    staleTime: 5000, // Time before new fetch after getting attention
   });
   let content;
 
