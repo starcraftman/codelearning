@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
           appBar: AppBar(
             title: const Text('First App'),
           ),
-          body: const GradientContainer(colors: [Colors.blue, Colors.purple])
+          body: GradientContainer.purple()
       ),
     );
   }
