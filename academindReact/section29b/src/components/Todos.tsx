@@ -1,22 +1,20 @@
-
-import React from "react";
-import TodoModel from "../models/todo";
+import React, { useContext } from "react";
 import TodoItem from "./TodoItem";
+import { TodosContext } from "../store/todos-context";
 
 import classes from "./Todos.module.css";
 
-type PropsType = {
-    items: TodoModel[];
-    removeHandler: (id: string) => void;
-};
-const Todos: React.FC<PropsType> = (props) => {
-    const listItems = props.items.map((x) => <TodoItem clickHandler={props.removeHandler.bind(null, x.id)} key={x.id} {...x} />);
+const Todos: React.FC = () => {
+ const ctx = useContext(TodosContext);
+  const listItems = ctx.items.map((x) => (
+    <TodoItem
+      clickHandler={ctx.removeTodo.bind(null, x.id)}
+      key={x.id}
+      {...x}
+    />
+  ));
 
-    return (
-        <ul className={classes.todos}>
-            {listItems}
-        </ul>
-    );
-}
+  return <ul className={classes.todos}>{listItems}</ul>;
+};
 
 export default Todos;
