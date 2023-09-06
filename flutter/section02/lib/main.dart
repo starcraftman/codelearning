@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:section02/gradient_container.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -15,14 +17,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.red,
       ),
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('First App'),
-        ),
-        body: Center(
-            child: Text(
-              'Hello World!',
-            )
-        ),
+          appBar: AppBar(
+            title: const Text('First App'),
+          ),
+          body: const GradientContainer(colors: [Colors.blue, Colors.purple])
       ),
     );
   }
