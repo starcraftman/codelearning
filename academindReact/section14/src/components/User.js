@@ -5,6 +5,10 @@ class User extends Component {
   render(props) {
     return <li className={classes.user}>{this.props.name}</li>;
   }
+
+  componentWillUnmount() {
+    console.log(`${this.props.name} will unmount`)
+  }
 };
 
 // const User = (props) => {
