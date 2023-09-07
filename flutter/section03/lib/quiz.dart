@@ -21,28 +21,45 @@ class _QuizState extends State<Quiz> {
     selectedAnswers.add(choice);
 
     if (selectedAnswers.length == questions.length) {
-      selectedAnswers.clear();
       setState(() {
-        activeScreen = "start-screen";
+        activeScreen = "results-screen";
       });
     }
   }
-
-  void switchScreen() {
+  void setQuestionsScreen() {
     setState(() {
       activeScreen = "questions-screen";
     });
   }
+  void setStartScreen() {
+    setState(() {
+      activeScreen = "start-screen";
+      selectedAnswers.clear();
+    });
+  }
 
+  // Summary of questions, answers and choice of user.s
+  List<Map<String, Object>> getSummaryData() {
+    final indices = List<int>.generate(questions.length, (index) => index);
+    return indices.map((ind) {
+      return {
+        "question_index": ind,
+        "question": questions[ind].question,
+        "correct_answer": questions[ind].choices[0],
+        "user_answer": selectedAnswers[ind],
+        "is_correct": selectedAnswers[ind] == questions[ind].choices[0]
+      };
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
-    Widget screenWidget = StartScreen(switchScreen);
+    Widget screenWidget = StartScreen(setQuestionsScreen);
     if (activeScreen == "questions-screen") {
       screenWidget = QuestionsScreen(addAnswer);
     }
     if (activeScreen == "results-screen") {
-      screenWidget = ResultsScreen(selectedAnswers);
+      screenWidget = ResultsScreen(getSummaryData(), restartHandler: setStartScreen);
     }
 
     return MaterialApp(
