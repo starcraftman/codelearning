@@ -1,4 +1,8 @@
+import "dart:math";
+
 import 'package:flutter/material.dart';
+import "package:section03/answer_button.dart";
+import "package:section03/data/questions.dart";
 
 class QuestionsScreen extends StatefulWidget {
   const QuestionsScreen({super.key});
@@ -13,6 +17,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
   String question = "How many legs on my cat?";
   List<String> choices = ["2 legs", "3 legs", "4 legs", "5 legs"];
   String answer = "4 legs";
+  int index = 0;
 
   void setQuestion({required question, required choices, required answer}) {
     this.question = question;
@@ -30,49 +35,50 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const SizedBox(height: 20),
-        Text(question,
-            style: const TextStyle(fontSize: 32, color: Colors.white)),
-        const SizedBox(height: 20),
-        TextButton(
-          onPressed: () {
-            return verify(0);
-          },
-          style: TextButton.styleFrom(
-              foregroundColor: Colors.white,
-              textStyle: const TextStyle(fontSize: 28)),
-          child: Text(choices[0]),
-        ),
-        const SizedBox(height: 20),
-        TextButton(
-            onPressed: () {
-              return verify(1);
-            },
-            style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                textStyle: const TextStyle(fontSize: 28)),
-            child: Text(choices[1])),
-        const SizedBox(height: 20),
-        TextButton(
-            onPressed: () {
-              return verify(2);
-            },
-            style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                textStyle: const TextStyle(fontSize: 28)),
-            child: Text(choices[2])),
-        const SizedBox(height: 20),
-        TextButton(
-            onPressed: () {
-              return verify(3);
-            },
-            style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                textStyle: const TextStyle(fontSize: 28)),
-            child: Text(choices[3])),
-      ]),
+    final currentQuestion = questions[0];
+
+    final shuffledChoices = [...currentQuestion.choices];
+    // Mapped then expand 2d list
+    var answersWithSizes = shuffledChoices.map((choice) {
+      return [
+        AnswerButton(choice: choice, onPressHandler: () {}),
+        const SizedBox(height: 12)
+      ];
+    });
+    List<Widget> colChildren = [for (var list in answersWithSizes) ...list];
+
+    // For each implementation
+    // currentQuestion.choices.forEach((choice) {
+    //   colChildren.addAll([
+    //     AnswerButton(choice: choice, onPressHandler: () {}),
+    //     const SizedBox(height: 12)
+    //   ]);
+    // });
+    // For loop implementation
+    // for (final choice in currentQuestion.choices) {
+    //   colChildren.addAll([
+    //     AnswerButton(choice: choice, onPressHandler: () {}),
+    //     const SizedBox(height: 12)
+    //   ]);
+    // }
+
+    return SizedBox(
+      width: double.infinity,
+      child: Container(
+        margin: const EdgeInsets.all(40),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                currentQuestion.question,
+                style: const TextStyle(fontSize: 18, color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 30),
+              ...colChildren
+            ]),
+      ),
     );
   }
 }
