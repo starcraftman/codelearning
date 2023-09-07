@@ -3,6 +3,7 @@ import "package:section03/questions_screen.dart";
 import "package:section03/results_screen.dart";
 import "package:section03/start_screen.dart";
 import "package:section03/data/questions.dart";
+import "package:section03/results_screen_alt.dart";
 
 class Quiz extends StatefulWidget {
   const Quiz({super.key});
@@ -22,7 +23,7 @@ class _QuizState extends State<Quiz> {
 
     if (selectedAnswers.length == questions.length) {
       setState(() {
-        activeScreen = "results-screen";
+        activeScreen = "results-screen-alt";
       });
     }
   }
@@ -52,6 +53,13 @@ class _QuizState extends State<Quiz> {
     }).toList();
   }
 
+  List<ResultItem> getResultsData() {
+    final indices = List<int>.generate(questions.length, (index) => index);
+    return indices.map((ind) {
+      return ResultItem(question: questions[ind].question, answer: questions[ind].choices[0], choice: selectedAnswers[ind], index: (ind + 1).toString());
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget screenWidget = StartScreen(setQuestionsScreen);
@@ -60,6 +68,9 @@ class _QuizState extends State<Quiz> {
     }
     if (activeScreen == "results-screen") {
       screenWidget = ResultsScreen(getSummaryData(), restartHandler: setStartScreen);
+    }
+    if (activeScreen == "results-screen-alt") {
+      screenWidget = ResultsScreenAlt(getResultsData(), restartHandler: setStartScreen);
     }
 
     return MaterialApp(
