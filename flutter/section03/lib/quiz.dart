@@ -16,12 +16,12 @@ class Quiz extends StatefulWidget {
 
 class _QuizState extends State<Quiz> {
   String activeScreen = "start-screen";
-  final List<String> selectedAnswers = [];
+  final List<String> _selectedAnswers = [];
 
   void addAnswer(String choice) {
-    selectedAnswers.add(choice);
+    _selectedAnswers.add(choice);
 
-    if (selectedAnswers.length == questions.length) {
+    if (_selectedAnswers.length == questions.length) {
       setState(() {
         activeScreen = "results-screen-alt";
       });
@@ -35,20 +35,20 @@ class _QuizState extends State<Quiz> {
   void setStartScreen() {
     setState(() {
       activeScreen = "start-screen";
-      selectedAnswers.clear();
+      _selectedAnswers.clear();
     });
   }
 
   // Summary of questions, answers and choice of user.s
-  List<Map<String, Object>> getSummaryData() {
+  List<Map<String, Object>> get summaryData {
     final indices = List<int>.generate(questions.length, (index) => index);
     return indices.map((ind) {
       return {
         "question_index": ind,
         "question": questions[ind].question,
         "correct_answer": questions[ind].choices[0],
-        "user_answer": selectedAnswers[ind],
-        "is_correct": selectedAnswers[ind] == questions[ind].choices[0]
+        "user_answer": _selectedAnswers[ind],
+        "is_correct": _selectedAnswers[ind] == questions[ind].choices[0]
       };
     }).toList();
   }
@@ -56,7 +56,7 @@ class _QuizState extends State<Quiz> {
   List<ResultItem> getResultsData() {
     final indices = List<int>.generate(questions.length, (index) => index);
     return indices.map((ind) {
-      return ResultItem(question: questions[ind].question, answer: questions[ind].choices[0], choice: selectedAnswers[ind], index: (ind + 1).toString());
+      return ResultItem(question: questions[ind].question, answer: questions[ind].choices[0], choice: _selectedAnswers[ind], index: (ind + 1).toString());
     }).toList();
   }
 
@@ -67,7 +67,7 @@ class _QuizState extends State<Quiz> {
       screenWidget = QuestionsScreen(addAnswer);
     }
     if (activeScreen == "results-screen") {
-      screenWidget = ResultsScreen(getSummaryData(), restartHandler: setStartScreen);
+      screenWidget = ResultsScreen(summaryData, restartHandler: setStartScreen);
     }
     if (activeScreen == "results-screen-alt") {
       screenWidget = ResultsScreenAlt(getResultsData(), restartHandler: setStartScreen);

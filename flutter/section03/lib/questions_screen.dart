@@ -31,7 +31,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
     final currentQuestion = questions[questionIndex];
 
     // Mapped then expand 2d list
-    var answersWithSizes = currentQuestion.getShuffledChoices().map((choice) {
+    var answersWithSizes = currentQuestion.shuffledChoices.map((choice) {
       return [
         AnswerButton(choice: choice, onPressHandler: () {
           answerQuestion(choice);
