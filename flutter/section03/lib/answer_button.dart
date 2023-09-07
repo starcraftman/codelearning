@@ -17,6 +17,6 @@ class AnswerButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 40),
           textStyle: const TextStyle(fontSize: 18),
         ),
-        child: Text(choice));
+        child: Text(choice, textAlign: TextAlign.center,));
   }
 }

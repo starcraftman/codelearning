@@ -1,11 +1,12 @@
-import "dart:math";
-
 import 'package:flutter/material.dart';
+import "package:google_fonts/google_fonts.dart";
+
 import "package:section03/answer_button.dart";
 import "package:section03/data/questions.dart";
 
 class QuestionsScreen extends StatefulWidget {
-  const QuestionsScreen({super.key});
+  final void Function(String choice) addAnswerHandler;
+  const QuestionsScreen(this.addAnswerHandler, {super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -16,12 +17,8 @@ class QuestionsScreen extends StatefulWidget {
 class _QuestionsScreenState extends State<QuestionsScreen> {
   int questionIndex = 0;
 
-  void answerQuestion(String choice, String answer) {
-    if (answer == choice) {
-      print("Correct");
-    } else {
-      print("Wrong");
-    }
+  void answerQuestion(String choice) {
+    widget.addAnswerHandler(choice);
     if (questions.length != questionIndex + 1) {
       setState(() {
         questionIndex += 1;
@@ -37,7 +34,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
     var answersWithSizes = currentQuestion.getShuffledChoices().map((choice) {
       return [
         AnswerButton(choice: choice, onPressHandler: () {
-          answerQuestion(choice, currentQuestion.choices[0]);
+          answerQuestion(choice);
         }),
         const SizedBox(height: 12)
       ];
@@ -68,7 +65,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
             Text(currentQuestion.question,
-                style: const TextStyle(fontSize: 18, color: Colors.white),
+                style: GoogleFonts.lato(fontSize: 24, color: const Color.fromARGB(255, 201, 200, 251), fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
 
             ),
