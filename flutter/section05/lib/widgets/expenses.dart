@@ -71,15 +71,25 @@ class _ExpensesState extends State<Expenses> {
       mainContent = ExpensesList(
           expenses: _registeredExpenses, onRemoveExpense: _removeExpense);
     }
+
+    final mediaSize = MediaQuery.of(context).size;
+    Widget scaffoldBody = Column(children: [
+      Chart(expenses: _registeredExpenses),
+      Expanded(child: mainContent)
+    ]);
+    if (mediaSize.width > 600) {
+      scaffoldBody = Row(children: [
+        Expanded(child: Chart(expenses: _registeredExpenses)),
+        Expanded(child: mainContent)
+      ]);
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text("Flutter ExpenseTracker"), actions: [
         IconButton(
             onPressed: _openAddExpenseOverlay, icon: const Icon(Icons.add))
       ]),
-      body: Column(children: [
-        Chart(expenses: _registeredExpenses),
-        Expanded(child: mainContent)
-      ]),
+      body: scaffoldBody,
     );
   }
 }
