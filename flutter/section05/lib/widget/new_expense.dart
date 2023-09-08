@@ -15,6 +15,7 @@ class _NewExpenseState extends State<NewExpense> {
   final _titleController = TextEditingController(text: "");
   final _amountController = TextEditingController(text: "");
   DateTime? _selectedDate;
+  ExpenseCategory _selectedCategory = ExpenseCategory.leisure;
 
   @override
   void dispose() {
@@ -39,11 +40,18 @@ class _NewExpenseState extends State<NewExpense> {
         context: context,
         initialDate: now,
         firstDate: initialDate,
-        lastDate: now
-    );
+        lastDate: now);
     setState(() {
       _selectedDate = pickedDate;
     });
+  }
+
+  void _selectCategory(value) {
+    if (value != null) {
+      setState(() {
+        _selectedCategory = value;
+      });
+    }
   }
 
   @override
@@ -71,22 +79,33 @@ class _NewExpenseState extends State<NewExpense> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(_selectedDate == null ? "Selected Date" : formatter.format(_selectedDate!)),
+                Text(_selectedDate == null
+                    ? "Selected Date"
+                    : formatter.format(_selectedDate!)),
                 IconButton(
                     onPressed: _presentDatePicker,
                     icon: const Icon(Icons.calendar_month))
               ],
             ))
           ]),
+          const SizedBox(height: 16),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            DropdownButton(
+                value: _selectedCategory,
+                items: ExpenseCategory.values
+                    .map((cat) => DropdownMenuItem(
+                        value: cat, child: Text(cat.name.toUpperCase())))
+                    .toList(),
+                onChanged: _selectCategory),
+            const Spacer(),
             ElevatedButton(
-                onPressed: _submitExpense, child: const Text("Save")),
+                onPressed: () => _cancelExpense(context),
+                child: const Text("Cancel")),
             const SizedBox(
               width: 40,
             ),
             ElevatedButton(
-                onPressed: () => _cancelExpense(context),
-                child: const Text("Cancel"))
+                onPressed: _submitExpense, child: const Text("Save")),
           ])
         ]));
   }
