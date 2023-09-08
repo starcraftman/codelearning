@@ -51,22 +51,20 @@ class _ExpensesState extends State<Expenses> {
           },
         ),
         duration: const Duration(seconds: 3),
-        content: const Text("Expense deleted.")
-    ));
+        content: const Text("Expense deleted.")));
   }
 
   void _openAddExpenseOverlay() {
     showModalBottomSheet(
-        isScrollControlled: true, context: context, builder: (ctx) {
-      return NewExpense(_addExpense);
-    });
+        useSafeArea: true,
+        isScrollControlled: true,
+        context: context,
+        builder: (ctx) => NewExpense(_addExpense));
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget mainContent = const Center(
-        child: Text("No expenses found.")
-    );
+    Widget mainContent = const Center(child: Text("No expenses found."));
     if (_registeredExpenses.isNotEmpty) {
       mainContent = ExpensesList(
           expenses: _registeredExpenses, onRemoveExpense: _removeExpense);
