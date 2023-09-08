@@ -24,6 +24,11 @@ class Expense {
   final double amount;
   final DateTime date;
 
+  @override
+  String toString() {
+    return "Expense(id='$id', title='$title', amount=$amount, category=$category, date=$date)";
+  }
+
   IconData get iconData {
     return expenseCategoryIcons[category]!;
   }
