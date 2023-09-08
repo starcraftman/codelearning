@@ -6,24 +6,21 @@ class ExpenseItem extends StatelessWidget {
 
   const ExpenseItem(this.expense, {super.key});
 
-  Widget iconSelector(ExpenseCategory cat) {
-    IconData iconData;
-    switch (cat) {
-      case ExpenseCategory.food:
-        iconData = Icons.local_pizza;
-        break;
-      case ExpenseCategory.travel:
-        iconData = Icons.airplane_ticket;
-        break;
-      case ExpenseCategory.leisure:
-        iconData = Icons.sports_basketball;
-        break;
-      default:
-        iconData = Icons.work;
-        break;
-    }
-
-    return Icon(iconData);
+  // Information below the title.
+  Widget bottomRow() {
+    return Row(
+      children: [
+        Text('\$${expense.amount.toStringAsFixed(2)}'),
+        const Spacer(),
+        Row(
+            children: [
+              Icon(expense.iconData),
+              const SizedBox(width: 8),
+              Text(expense.formattedDate)
+            ]
+        )
+      ],
+    );
   }
 
 
@@ -36,19 +33,7 @@ class ExpenseItem extends StatelessWidget {
           children: [
             Text(expense.title),
             const SizedBox(height: 4),
-            Row(
-              children: [
-                Text('\$${expense.amount.toStringAsFixed(2)}'),
-                const Spacer(),
-                Row(
-                    children: [
-                      iconSelector(expense.category),
-                      const SizedBox(width: 8),
-                      Text(expense.date.toString())
-                    ]
-                )
-              ],
-            )
+            bottomRow()
           ]
         ),
       )
