@@ -3,7 +3,7 @@ import "package:section08/models/category.dart";
 
 class CategoryGridItem extends StatelessWidget {
   final Category category;
-  final Function({required String title}) onTapHandler;
+  final Function() onTapHandler;
 
   const CategoryGridItem({super.key, required this.category, required this.onTapHandler});
 
@@ -11,9 +11,7 @@ class CategoryGridItem extends StatelessWidget {
   Widget build(BuildContext context) {
     const borderRadiusVal = 16.0;
     return InkWell(
-      onTap: () {
-        onTapHandler(title: category.title);
-      },
+      onTap: onTapHandler,
       borderRadius: BorderRadius.circular(borderRadiusVal),
       splashColor: Theme.of(context).primaryColor,
       child: Container(
