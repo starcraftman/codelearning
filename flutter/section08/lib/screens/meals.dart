@@ -6,9 +6,9 @@ import 'package:section08/widgets/meal_item/meal_item.dart';
 class MealsScreen extends StatelessWidget {
   final Color categoryColor;
   final List<Meal> meals;
-  final String title;
+  final String? title;
 
-  const MealsScreen({super.key, required this.meals, required this.title, required this.categoryColor});
+  const MealsScreen({super.key, required this.meals, this.title, required this.categoryColor});
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +44,13 @@ class MealsScreen extends StatelessWidget {
           });
     }
 
+    if (title == null) {
+      return bodyWidget;
+    }
+
     return Scaffold(
         appBar: AppBar(
-          title: Text(title),
+          title: Text(title!),
           backgroundColor: categoryColor,
         ),
         body : bodyWidget

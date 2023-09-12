@@ -18,11 +18,7 @@ class CategoriesScreen extends StatelessWidget {
     final categoryGridItems = availableCategories.map((cat) {
       return CategoryGridItem(category: cat, onTapHandler: () => _selectCategory(context, cat));
     }).toList();
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Pick your category"),
-      ),
-      body: GridView(
+    return GridView(
         padding: const EdgeInsets.all(24),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -31,7 +27,6 @@ class CategoriesScreen extends StatelessWidget {
           childAspectRatio: 3 / 2
         ),
         children: categoryGridItems,
-      ),
     );
   }
 
