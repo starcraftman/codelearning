@@ -1,8 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:section08/data/dummy_data.dart';
 import 'package:section08/screens/categories.dart';
+import 'package:section08/screens/filters.dart';
 import 'package:section08/screens/meals.dart';
 
 import '../models/meal.dart';
+import 'package:section08/widgets/tabs_drawer.dart';
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({super.key});
@@ -15,6 +19,12 @@ class TabsScreen extends StatefulWidget {
 }
 
 class _TabsScreenState extends State<TabsScreen> {
+  FoodFilters filters = FoodFilters(
+      glutenFree: false,
+      lactoseFree: false,
+      vegetarian: false,
+      vegan: false
+  );
   int _selectedPageIndex = 0;
   final List<Meal> _favoriteMeals = [];
 
@@ -22,6 +32,18 @@ class _TabsScreenState extends State<TabsScreen> {
     setState(() {
       _selectedPageIndex = index;
     });
+  }
+
+  void _setScreen(String identifier) async {
+    Navigator.pop(context);
+    if (identifier == "Filters") {
+      final result = await Navigator.of(context).push<FoodFilters>(
+          MaterialPageRoute(builder: (ctx) => FiltersScreen(initFilters: filters))
+      );
+      setState(() {
+        filters = result ?? FoodFilters.initial();
+      });
+    }
   }
 
   void _showInfoMessage(String msg) {
@@ -44,13 +66,31 @@ class _TabsScreenState extends State<TabsScreen> {
       _showInfoMessage("Removed ${meal.title} from faves.");
     }
 
-    print("Faves ${_favoriteMeals.toString()}");
+    if (kDebugMode) {
+      print("Faves ${_favoriteMeals.toString()}");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final availableMeals = dummyMeals.where((meal) {
+      if (filters.glutenFree && !meal.isGlutenFree) {
+        return false;
+      }
+      if (filters.lactoseFree && !meal.isLactoseFree) {
+        return false;
+      }
+      if (filters.vegetarian && !meal.isVegetarian) {
+        return false;
+      }
+      if (filters.vegan && !meal.isVegan) {
+        return false;
+      }
+
+      return true;
+    }).toList();
     final bodyContent = _selectedPageIndex == 0
-      ? CategoriesScreen(onToggleFave: _toggleMealFavoriteStatus)
+      ? CategoriesScreen(onToggleFave: _toggleMealFavoriteStatus, availableMeals: availableMeals)
       : MealsScreen(meals: _favoriteMeals, categoryColor: Colors.blueAccent, onToggleFave: _toggleMealFavoriteStatus);
     final activePageTitle = _selectedPageIndex == 0 ? "Categories" : "Your Favorites";
 
@@ -59,6 +99,7 @@ class _TabsScreenState extends State<TabsScreen> {
         title: Text(activePageTitle),
       ),
       body: bodyContent,
+      drawer: TabsDrawer(onSelectScreen: _setScreen),
       bottomNavigationBar: BottomNavigationBar(
         onTap: _selectPage,
         currentIndex: _selectedPageIndex,

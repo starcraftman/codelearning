@@ -9,18 +9,24 @@ import "../models/meal.dart";
 
 class CategoriesScreen extends StatelessWidget {
   final void Function(Meal meal) onToggleFave;
-  const CategoriesScreen({super.key, required this.onToggleFave});
+  final List<Meal> availableMeals;
+  const CategoriesScreen({super.key, required this.onToggleFave, required this.availableMeals});
 
   void _selectCategory(BuildContext ctx, Category cat) {
-    final filteredMeals = dummyMeals.where((meal) => meal.categories.contains(cat.id)).toList();
+    final filteredMeals = availableMeals.where((meal) => meal.categories.contains(cat.id)).toList();
     Navigator.push(ctx, MaterialPageRoute(builder: (ctx) => MealsScreen(meals: filteredMeals, title: cat.title, categoryColor: cat.color, onToggleFave: onToggleFave)));
   }
 
   @override
   Widget build(BuildContext context) {
-    final categoryGridItems = availableCategories.map((cat) {
-      return CategoryGridItem(category: cat, onTapHandler: () => _selectCategory(context, cat));
-    }).toList();
+    final categoryGridItems = availableCategories
+      .where((cat) {
+        return availableMeals.where((meal) => meal.categories.contains(cat.id)).isNotEmpty;
+      })
+      .map((cat) {
+        return CategoryGridItem(category: cat, onTapHandler: () => _selectCategory(context, cat));
+      })
+      .toList();
     return GridView(
         padding: const EdgeInsets.all(24),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
