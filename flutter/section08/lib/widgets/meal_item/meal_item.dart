@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import "package:transparent_image/transparent_image.dart";
 
 import "package:section08/models/meal.dart";
+import "package:section08/screens/meal_details.dart";
 
 import 'meal_item_overlay.dart';
 
@@ -9,6 +10,10 @@ class MealItem extends StatelessWidget {
   final Meal meal;
 
   const MealItem({super.key, required this.meal});
+
+  void _selectMeal(BuildContext ctx, Meal meal) {
+    Navigator.of(ctx).push(MaterialPageRoute(builder: (ctx) => MealDetailsScreen(meal: meal)));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +25,7 @@ class MealItem extends StatelessWidget {
       elevation: 2,
       child: InkWell(
         onTap: () {
+          _selectMeal(context, meal);
         },
         borderRadius: BorderRadius.circular(borderRadiusVal),
         splashColor: Theme.of(context).primaryColor,
