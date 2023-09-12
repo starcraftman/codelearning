@@ -1,45 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class FoodFilters {
-  final bool glutenFree;
-  final bool lactoseFree;
-  final bool vegetarian;
-  final bool vegan;
+import 'package:section08/providers/filters_provider.dart';
 
-  FoodFilters({required this.glutenFree, required this.lactoseFree, required this.vegetarian, required this.vegan});
-  FoodFilters.initial(): glutenFree = false, lactoseFree = false, vegetarian = false, vegan = false;
+class FiltersScreen extends ConsumerStatefulWidget {
+  const FiltersScreen({super.key});
 
   @override
-  String toString() {
-    return "Active Filters: g $glutenFree l $lactoseFree ve $vegetarian vn $vegan";
-  }
-}
-
-class FiltersScreen extends StatefulWidget {
-  final FoodFilters initFilters;
-  const FiltersScreen({super.key, required this.initFilters});
-
-  @override
-  State<StatefulWidget> createState() {
+  ConsumerState<FiltersScreen> createState() {
     return _FiltersScreenState();
   }
 }
 
-class _FiltersScreenState extends State<FiltersScreen> {
+class _FiltersScreenState extends ConsumerState<FiltersScreen> {
   FoodFilters filters = FoodFilters.initial();
 
   @override
   void initState() {
     super.initState();
-    filters = widget.initFilters;
+    filters = ref.read(filtersProvider);
   }
 
   @override
   Widget build(BuildContext context) {
+    final filtersNotifier = ref.watch(filtersProvider.notifier);
+
+    print("BUILD ENTRY");
+    print(filters);
     return WillPopScope(
       onWillPop: () async {
-        Navigator.of(context).pop(filters);
-        return false;
+        filtersNotifier.setFilters(filters);
+        return true;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -55,56 +46,36 @@ class _FiltersScreenState extends State<FiltersScreen> {
           children: [
             _SwitchTile(
               state: filters.glutenFree,
-              onChange: (bool state) {
-              setState(() {
-                filters = FoodFilters(
-                  glutenFree: state,
-                  lactoseFree: filters.lactoseFree,
-                  vegetarian: filters.vegetarian,
-                  vegan: filters.vegan
-                );
-              });
+              onChange: (bool isActive) {
+                setState(() {
+                  filters = filters.setGlutenFree(isActive);
+                });
               }, title: "Gluten-free",
               subtitle: "Only include gluten-free meals.",
             ),
             _SwitchTile(
               state: filters.lactoseFree,
-              onChange: (bool state) {
+              onChange: (bool isActive) {
                 setState(() {
-                  filters = FoodFilters(
-                    glutenFree: filters.glutenFree,
-                    lactoseFree: state,
-                    vegetarian: filters.vegetarian,
-                    vegan: filters.vegan
-                  );
+                  filters = filters.setLactoseFree(isActive);
                 });
               }, title: "Lactose-free",
               subtitle: "Only include meals with no dairy."
             ),
             _SwitchTile(
               state: filters.vegetarian,
-              onChange: (bool state) {
+              onChange: (bool isActive) {
                 setState(() {
-                  filters = FoodFilters(
-                    glutenFree: filters.glutenFree,
-                    lactoseFree: filters.lactoseFree,
-                    vegetarian: state,
-                    vegan: false,
-                  );
+                  filters = filters.setVegetarian(isActive);
                 });
               }, title: "Vegetarian",
               subtitle: "Only include vegetarian meals."
             ),
             _SwitchTile(
               state: filters.vegan,
-              onChange: (bool state) {
+              onChange: (bool isActive) {
                 setState(() {
-                  filters = FoodFilters(
-                    glutenFree: filters.glutenFree,
-                    lactoseFree: filters.lactoseFree,
-                    vegetarian: false,
-                    vegan: state,
-                  );
+                  filters = filters.setVegan(isActive);
                 });
               }, title: "Vegan",
               subtitle: "Only include vegan meals."
