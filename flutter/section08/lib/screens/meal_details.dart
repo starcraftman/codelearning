@@ -13,6 +13,7 @@ class MealDetailsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final faves = ref.watch(favoriteMealsProvider);
+    final bool isFaved = faves.contains(meal);
 
     return Scaffold(
       appBar: AppBar(
@@ -25,8 +26,8 @@ class MealDetailsScreen extends ConsumerWidget {
               ScaffoldMessenger.of(context).clearSnackBars();
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
             },
-            icon: const Icon(Icons.star),
-            color: faves.contains(meal) ? Colors.yellow : null,
+            icon: Icon(isFaved ? Icons.star : Icons.star_border),
+            color: isFaved ? Colors.yellow : null,
           )
         ],
         title: Text(meal.title),

@@ -3,36 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:section08/providers/filters_provider.dart';
 
-class FiltersScreen extends ConsumerStatefulWidget {
+class FiltersScreen extends ConsumerWidget {
   const FiltersScreen({super.key});
 
   @override
-  ConsumerState<FiltersScreen> createState() {
-    return _FiltersScreenState();
-  }
-}
-
-class _FiltersScreenState extends ConsumerState<FiltersScreen> {
-  FoodFilters filters = FoodFilters.initial();
-
-  @override
-  void initState() {
-    super.initState();
-    filters = ref.read(filtersProvider);
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final filtersNotifier = ref.watch(filtersProvider.notifier);
+    final filters = ref.watch(filtersProvider);
 
-    print("BUILD ENTRY");
-    print(filters);
-    return WillPopScope(
-      onWillPop: () async {
-        filtersNotifier.setFilters(filters);
-        return true;
-      },
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: const Text("Your Filters"),
         ),
@@ -47,41 +26,32 @@ class _FiltersScreenState extends ConsumerState<FiltersScreen> {
             _SwitchTile(
               state: filters.glutenFree,
               onChange: (bool isActive) {
-                setState(() {
-                  filters = filters.setGlutenFree(isActive);
-                });
+                filtersNotifier.setFilter(FilterType.glutenFree, isActive);
               }, title: "Gluten-free",
               subtitle: "Only include gluten-free meals.",
             ),
             _SwitchTile(
               state: filters.lactoseFree,
               onChange: (bool isActive) {
-                setState(() {
-                  filters = filters.setLactoseFree(isActive);
-                });
+                filtersNotifier.setFilter(FilterType.lactoseFree, isActive);
               }, title: "Lactose-free",
               subtitle: "Only include meals with no dairy."
             ),
             _SwitchTile(
               state: filters.vegetarian,
               onChange: (bool isActive) {
-                setState(() {
-                  filters = filters.setVegetarian(isActive);
-                });
+                filtersNotifier.setFilter(FilterType.vegetarian, isActive);
               }, title: "Vegetarian",
               subtitle: "Only include vegetarian meals."
             ),
             _SwitchTile(
               state: filters.vegan,
               onChange: (bool isActive) {
-                setState(() {
-                  filters = filters.setVegan(isActive);
-                });
+                filtersNotifier.setFilter(FilterType.vegan, isActive);
               }, title: "Vegan",
               subtitle: "Only include vegan meals."
             ),
         ],)
-      ),
     );
   }
 }
