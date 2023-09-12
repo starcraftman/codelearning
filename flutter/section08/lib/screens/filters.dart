@@ -89,7 +89,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     glutenFree: filters.glutenFree,
                     lactoseFree: filters.lactoseFree,
                     vegetarian: state,
-                    vegan: filters.vegan
+                    vegan: false,
                   );
                 });
               }, title: "Vegetarian",
@@ -102,7 +102,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                   filters = FoodFilters(
                     glutenFree: filters.glutenFree,
                     lactoseFree: filters.lactoseFree,
-                    vegetarian: filters.vegetarian,
+                    vegetarian: false,
                     vegan: state,
                   );
                 });
@@ -130,7 +130,7 @@ class _SwitchTile extends StatelessWidget {
       onChanged: onChange,
       title: Text(title,
         style: Theme.of(context).textTheme.titleLarge!.copyWith(
-            color: Theme.of(context).colorScheme.onBackground
+          color: Theme.of(context).colorScheme.onBackground
         ),
       ),
       subtitle: Text(subtitle),

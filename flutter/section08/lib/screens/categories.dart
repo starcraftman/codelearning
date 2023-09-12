@@ -8,13 +8,12 @@ import "package:section08/widgets/category_grid_item.dart";
 import "../models/meal.dart";
 
 class CategoriesScreen extends StatelessWidget {
-  final void Function(Meal meal) onToggleFave;
   final List<Meal> availableMeals;
-  const CategoriesScreen({super.key, required this.onToggleFave, required this.availableMeals});
+  const CategoriesScreen({super.key, required this.availableMeals});
 
   void _selectCategory(BuildContext ctx, Category cat) {
     final filteredMeals = availableMeals.where((meal) => meal.categories.contains(cat.id)).toList();
-    Navigator.push(ctx, MaterialPageRoute(builder: (ctx) => MealsScreen(meals: filteredMeals, title: cat.title, categoryColor: cat.color, onToggleFave: onToggleFave)));
+    Navigator.push(ctx, MaterialPageRoute(builder: (ctx) => MealsScreen(meals: filteredMeals, title: cat.title, categoryColor: cat.color)));
   }
 
   @override

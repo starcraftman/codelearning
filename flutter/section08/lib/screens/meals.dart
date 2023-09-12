@@ -4,12 +4,11 @@ import "package:section08/models/meal.dart";
 import 'package:section08/widgets/meal_item/meal_item.dart';
 
 class MealsScreen extends StatelessWidget {
-  final void Function(Meal meal) onToggleFave;
   final Color categoryColor;
   final List<Meal> meals;
   final String? title;
 
-  const MealsScreen({super.key, required this.meals, this.title, required this.categoryColor, required this.onToggleFave});
+  const MealsScreen({super.key, required this.meals, this.title, required this.categoryColor});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +36,6 @@ class MealsScreen extends StatelessWidget {
         itemCount: meals.length,
         itemBuilder: (ctx, index) {
           return MealItem(
-            onToggleFave: onToggleFave,
             meal: meals[index],
             key: ValueKey(meals[index],)
           );
