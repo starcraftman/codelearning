@@ -7,12 +7,13 @@ import "package:section08/screens/meal_details.dart";
 import 'meal_item_overlay.dart';
 
 class MealItem extends StatelessWidget {
+  final void Function(Meal meal) onToggleFave;
   final Meal meal;
 
-  const MealItem({super.key, required this.meal});
+  const MealItem({super.key, required this.meal, required this.onToggleFave});
 
   void _selectMeal(BuildContext ctx, Meal meal) {
-    Navigator.of(ctx).push(MaterialPageRoute(builder: (ctx) => MealDetailsScreen(meal: meal)));
+    Navigator.of(ctx).push(MaterialPageRoute(builder: (ctx) => MealDetailsScreen(meal: meal, onToggleFave: onToggleFave)));
   }
 
   @override
