@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import 'package:section11/models/category.dart';
 
 class GroceryItem {
@@ -14,4 +12,9 @@ class GroceryItem {
     required this.quantity,
     required this.category
   });
+
+  @override
+  String toString() {
+    return "GroceryItem: $name x $quantity ($category)";
+  }
 }
