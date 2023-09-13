@@ -18,13 +18,16 @@ class PlaceDetails extends StatelessWidget {
           }, icon: const Icon(Icons.add),)
         ],
       ),
-      body: Center(
-        child: Text(place.name,
-          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-            color: Theme.of(context).colorScheme.secondary
-          )
-        ),
-      ),
+      body: Stack(
+        children: [
+          Image.file(
+            place.image,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+          ),
+        ],
+      )
     );
   }
 }
