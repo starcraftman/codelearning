@@ -15,51 +15,34 @@ class GroceryScreen extends StatefulWidget {
 
 class _GroceryScreenState extends State<GroceryScreen> {
   List<GroceryItem> _groceryItems = [];
-  bool _isLoading = true;
-  String _error = '';
+  late Future<List<GroceryItem>> _loadedItems;
 
   @override
   void initState() {
     super.initState();
-    _loadItems();
+    _loadedItems = _loadItems();
   }
 
-  void _loadItems() async {
+  Future<List<GroceryItem>> _loadItems() async {
     final fireUrl = await rootBundle.loadString('assets/secrets.private');
     final url = Uri.https(fireUrl.trim(), 'shop.json');
-    try {
-      final resp = await http.get(url);
-      if (resp.statusCode > 400) {
-        setState(() {
-          _error = "Failed to fetch data. Try again later.";
-        });
-        return;
-      }
-
-      if (resp.body == 'null') {
-        return;
-      }
-
-      final Map<String, dynamic> data = json.decode(resp.body);
-      List<GroceryItem> loadedItems = [];
-      for (final key in data.keys) {
-        data[key]?['id'] = key;
-        GroceryItem item = GroceryItem.fromJson(data[key]!);
-        loadedItems.add(item);
-      }
-      setState(() {
-        _groceryItems = loadedItems;
-      });
-
-    } catch ( error) {
-      setState(() {
-        _error = "Unknown error caused failure on load.";
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+    final resp = await http.get(url);
+    if (resp.statusCode > 400) {
+      throw Exception("Failed to fetch data. Try again later.");
     }
+
+    if (resp.body == 'null') {
+      return [];
+    }
+
+    final Map<String, dynamic> data = json.decode(resp.body);
+    List<GroceryItem> loadedItems = [];
+    for (final key in data.keys) {
+      data[key]?['id'] = key;
+      GroceryItem item = GroceryItem.fromJson(data[key]!);
+      loadedItems.add(item);
+    }
+    return loadedItems;
   }
 
   void _removeItemFire(GroceryItem item) async {
@@ -81,7 +64,6 @@ class _GroceryScreenState extends State<GroceryScreen> {
         _groceryItems.insert(index, item);
       });
     }
-
   }
 
   void _addItem() async {
@@ -95,13 +77,11 @@ class _GroceryScreenState extends State<GroceryScreen> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    Widget groceryBody() {
-      return ListView.builder(
-        itemCount: _groceryItems.length,
+  Widget groceryBody(List<GroceryItem> groceryItems) {
+    return ListView.builder(
+        itemCount: groceryItems.length,
         itemBuilder: (ctx, index) {
-          final item = _groceryItems[index];
+          final item = groceryItems[index];
           return Dismissible(
             key: ValueKey(item),
             onDismissed: (direction) {
@@ -118,24 +98,11 @@ class _GroceryScreenState extends State<GroceryScreen> {
             ),
           );
         }
-      );
-    }
-
-    Widget content = const Center(
-      child: Text("No items in list.",
-        style: TextStyle(fontSize: 24),
-      ),
     );
-    if (_isLoading) {
-      content = const Center(child: CircularProgressIndicator());
-    }
-    if (_error.trim().isNotEmpty) {
-      content = Center(child: Text(_error, style: const TextStyle(fontSize: 28, color: Colors.red)));
-    }
-    if (_groceryItems.isNotEmpty) {
-      content = groceryBody();
-    }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Your Groceries"),
@@ -146,7 +113,28 @@ class _GroceryScreenState extends State<GroceryScreen> {
           )
         ],
       ),
-      body: content
+      body: FutureBuilder<List<GroceryItem>> (
+        builder: (context, snapshot) {
+          Widget content = const Center(
+            child: Text("No items in list.",
+              style: TextStyle(fontSize: 24),
+            ),
+          );
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            content = const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            content = Center(child: Text(snapshot.error.toString(), style: const TextStyle(fontSize: 28, color: Colors.red)));
+          }
+          if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+            content = groceryBody(snapshot.data!);
+          }
+
+          return content;
+        },
+        future: _loadedItems,
+      )
     );
   }
 }
