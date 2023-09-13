@@ -26,51 +26,62 @@ class _GroceryScreenState extends State<GroceryScreen> {
 
   void _loadItems() async {
     final fireUrl = await rootBundle.loadString('assets/secrets.private');
-    final url = Uri.https(fireUrl, 'shop.json');
-    final resp = await http.get(url);
+    final url = Uri.https(fireUrl.trim(), 'shop.json');
+    try {
+      final resp = await http.get(url);
+      if (resp.statusCode > 400) {
+        setState(() {
+          _error = "Failed to fetch data. Try again later.";
+        });
+        return;
+      }
 
-    print("Resp: ${resp.statusCode}");
-    if (resp.statusCode > 400) {
-      setState(() {
-        _isLoading = false;
-        _error = "Failed to fetch data. Try again later.";
-      });
-      return;
-    }
+      if (resp.body == 'null') {
+        return;
+      }
 
-    final Map<String, dynamic> data = json.decode(resp.body);
+      final Map<String, dynamic> data = json.decode(resp.body);
       List<GroceryItem> loadedItems = [];
       for (final key in data.keys) {
         data[key]?['id'] = key;
         GroceryItem item = GroceryItem.fromJson(data[key]!);
         loadedItems.add(item);
       }
-    setState(() {
-      _groceryItems = loadedItems;
-    });
-    _isLoading = false;
+      setState(() {
+        _groceryItems = loadedItems;
+      });
+
+    } catch ( error) {
+      setState(() {
+        _error = "Unknown error caused failure on load.";
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _removeItemFire(GroceryItem item) async {
-    final fireUrl = await rootBundle.loadString('assets/secrets.private');
-    final url = Uri.https(fireUrl.trim(), 'shop.json');
-    final resp = await http.delete(url,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: json.encode({'id': item.id})
-    );
-
-    final Map<String, dynamic> data = json.decode(resp.body);
-    List<GroceryItem> loadedItems = [];
-    for (final key in data.keys) {
-      data[key]?['id'] = key;
-      GroceryItem item = GroceryItem.fromJson(data[key]!);
-      loadedItems.add(item);
-    }
+    final index = _groceryItems.indexOf(item);
     setState(() {
-      _groceryItems = loadedItems;
+      _groceryItems.remove(item);
     });
+
+    final fireUrl = await rootBundle.loadString('assets/secrets.private');
+    final url = Uri.https(fireUrl.trim(), 'shop/${item.id}.json');
+    final resp = await http.delete(url);
+
+    if (resp.statusCode > 400) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to delete item, backend down.")));
+      }
+      setState(() {
+        _groceryItems.insert(index, item);
+      });
+    }
+
   }
 
   void _addItem() async {
@@ -94,9 +105,7 @@ class _GroceryScreenState extends State<GroceryScreen> {
           return Dismissible(
             key: ValueKey(item),
             onDismissed: (direction) {
-              setState(() {
-                _groceryItems.remove(item);
-              });
+              _removeItemFire(item);
             },
             child: ListTile(
               title: Text(item.name),
@@ -121,7 +130,7 @@ class _GroceryScreenState extends State<GroceryScreen> {
       content = const Center(child: CircularProgressIndicator());
     }
     if (_error.trim().isNotEmpty) {
-      content = Center(child: Text(_error, style: const TextStyle(color: Colors.red)));
+      content = Center(child: Text(_error, style: const TextStyle(fontSize: 28, color: Colors.red)));
     }
     if (_groceryItems.isNotEmpty) {
       content = groceryBody();
