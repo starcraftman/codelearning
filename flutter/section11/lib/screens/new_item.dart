@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 
 import 'package:section11/data/categories.dart';
 import 'package:section11/models/category.dart';
 import 'package:section11/models/grocery_item.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart' show rootBundle;
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -19,16 +22,30 @@ class _NewItemState extends State<NewItem> {
   int _enteredQuantity = 1;
   Category _selectedCategory = categories[Categories.vegetables]!;
 
-  void _saveItem() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      final groceryItem = GroceryItem(
-        id: DateTime.now().toString(),
-        name: _enteredName,
-        quantity: _enteredQuantity,
-        category: _selectedCategory
-      );
-      Navigator.pop(context, groceryItem);
+  void _saveItem() async {
+    if (!_formKey.currentState!.validate()) {
+      return ;
+    }
+
+    _formKey.currentState!.save();
+    final groceryItem = GroceryItem(
+      id: DateTime.now().toString(),
+      name: _enteredName,
+      quantity: _enteredQuantity,
+      category: _selectedCategory
+    );
+
+    final fireUrl = await rootBundle.loadString('assets/secrets.private');
+    final url = Uri.https(fireUrl.trim(), 'shop.json');
+    final resp = await http.post(url,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: json.encode(groceryItem)
+    );
+    final id = json.decode(resp.body)['name'];
+    if (context.mounted) {
+      Navigator.pop(context, groceryItem.updateId(id));
     }
   }
 

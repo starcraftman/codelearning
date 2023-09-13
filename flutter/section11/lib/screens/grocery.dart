@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 
 import 'package:section11/models/grocery_item.dart';
 import 'package:section11/screens/new_item.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:http/http.dart' as http;
 
 class GroceryScreen extends StatefulWidget {
   const GroceryScreen({super.key});
@@ -11,15 +14,62 @@ class GroceryScreen extends StatefulWidget {
 }
 
 class _GroceryScreenState extends State<GroceryScreen> {
-  final List<GroceryItem> _groceryItems = [];
+  List<GroceryItem> _groceryItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadItems();
+  }
+
+  void _loadItems() async {
+    final fireUrl = await rootBundle.loadString('assets/secrets.private');
+    final url = Uri.https(fireUrl.trim(), 'shop.json');
+    final resp = await http.get(url);
+
+    final Map<String, dynamic> data = json.decode(resp.body);
+      List<GroceryItem> loadedItems = [];
+      for (final key in data.keys) {
+        data[key]?['id'] = key;
+        GroceryItem item = GroceryItem.fromJson(data[key]!);
+        loadedItems.add(item);
+      }
+    setState(() {
+      _groceryItems = loadedItems;
+    });
+  }
+
+  void _removeItemFire(GroceryItem item) async {
+    final fireUrl = await rootBundle.loadString('assets/secrets.private');
+    final url = Uri.https(fireUrl.trim(), 'shop.json');
+    final resp = await http.delete(url,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: json.encode({'id': item.id})
+    );
+
+    final Map<String, dynamic> data = json.decode(resp.body);
+    List<GroceryItem> loadedItems = [];
+    for (final key in data.keys) {
+      data[key]?['id'] = key;
+      GroceryItem item = GroceryItem.fromJson(data[key]!);
+      loadedItems.add(item);
+    }
+    setState(() {
+      _groceryItems = loadedItems;
+    });
+  }
 
   void _addItem() async {
-    final GroceryItem? item = await Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => const NewItem()));
-    if (item != null) {
-      setState(() {
-        _groceryItems.add(item);
-      });
+    final GroceryItem newItem = await Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => const NewItem()));
+    if (newItem == null) {
+      return;
     }
+
+    setState(() {
+      _groceryItems.add(newItem);
+    });
   }
 
   @override
