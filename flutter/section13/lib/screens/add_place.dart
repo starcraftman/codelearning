@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:section13/models/place.dart';
 import 'package:section13/providers/places_provider.dart';
 import 'package:section13/widgets/image_input.dart';
+import 'package:section13/widgets/location_input.dart';
 
 class AddPlacesScreen extends ConsumerStatefulWidget {
   const AddPlacesScreen({super.key});
@@ -58,6 +59,8 @@ class _AddPlaceScreenState extends ConsumerState<AddPlacesScreen> {
           ),
           const SizedBox(height: 10,),
           ImageInput(onSelectImage: _selectImage),
+          const SizedBox(height: 10,),
+          const LocationInput(),
           const SizedBox(height: 16,),
           ElevatedButton.icon(
             onPressed: () {
