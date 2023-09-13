@@ -15,6 +15,8 @@ class GroceryScreen extends StatefulWidget {
 
 class _GroceryScreenState extends State<GroceryScreen> {
   List<GroceryItem> _groceryItems = [];
+  bool _isLoading = true;
+  String _error = '';
 
   @override
   void initState() {
@@ -24,8 +26,17 @@ class _GroceryScreenState extends State<GroceryScreen> {
 
   void _loadItems() async {
     final fireUrl = await rootBundle.loadString('assets/secrets.private');
-    final url = Uri.https(fireUrl.trim(), 'shop.json');
+    final url = Uri.https(fireUrl, 'shop.json');
     final resp = await http.get(url);
+
+    print("Resp: ${resp.statusCode}");
+    if (resp.statusCode > 400) {
+      setState(() {
+        _isLoading = false;
+        _error = "Failed to fetch data. Try again later.";
+      });
+      return;
+    }
 
     final Map<String, dynamic> data = json.decode(resp.body);
       List<GroceryItem> loadedItems = [];
@@ -37,6 +48,7 @@ class _GroceryScreenState extends State<GroceryScreen> {
     setState(() {
       _groceryItems = loadedItems;
     });
+    _isLoading = false;
   }
 
   void _removeItemFire(GroceryItem item) async {
@@ -62,7 +74,7 @@ class _GroceryScreenState extends State<GroceryScreen> {
   }
 
   void _addItem() async {
-    final GroceryItem newItem = await Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => const NewItem()));
+    final GroceryItem? newItem = await Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => const NewItem()));
     if (newItem == null) {
       return;
     }
@@ -74,7 +86,7 @@ class _GroceryScreenState extends State<GroceryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget listBody() {
+    Widget groceryBody() {
       return ListView.builder(
         itemCount: _groceryItems.length,
         itemBuilder: (ctx, index) {
@@ -100,12 +112,19 @@ class _GroceryScreenState extends State<GroceryScreen> {
       );
     }
 
-    Widget noItemsBody() {
-      return const Center(
-        child: Text("No items in list.",
-          style: TextStyle(fontSize: 24),
-        ),
-      );
+    Widget content = const Center(
+      child: Text("No items in list.",
+        style: TextStyle(fontSize: 24),
+      ),
+    );
+    if (_isLoading) {
+      content = const Center(child: CircularProgressIndicator());
+    }
+    if (_error.trim().isNotEmpty) {
+      content = Center(child: Text(_error, style: const TextStyle(color: Colors.red)));
+    }
+    if (_groceryItems.isNotEmpty) {
+      content = groceryBody();
     }
 
     return Scaffold(
@@ -118,7 +137,7 @@ class _GroceryScreenState extends State<GroceryScreen> {
           )
         ],
       ),
-      body: _groceryItems.isNotEmpty ? listBody() : noItemsBody()
+      body: content
     );
   }
 }
