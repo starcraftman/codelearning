@@ -20,10 +20,17 @@ class PlaceLocation {
   final double latitude;
   final double longitude;
   final String address;
+  final String imageUrl;
 
   const PlaceLocation({
     required this.latitude,
     required this.longitude,
     required this.address,
+    required this.imageUrl
   });
+
+  @override
+  String toString() {
+    return "PlaceLocation: $address ($latitude,$longitude)";
+  }
 }

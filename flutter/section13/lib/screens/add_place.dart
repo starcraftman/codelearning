@@ -27,6 +27,7 @@ class _AddPlaceScreenState extends ConsumerState<AddPlacesScreen> {
     if (!_formKey.currentState!.validate() || _selectedImage == null || _selectedLocation == null) {
       return;
     }
+
     _formKey.currentState!.save();
     ref.read(placesProvider.notifier).addPlace(Place(name: _enteredPlace, image: _selectedImage!, location: _selectedLocation!));
     Navigator.of(context).pop();
@@ -34,8 +35,8 @@ class _AddPlaceScreenState extends ConsumerState<AddPlacesScreen> {
   void _selectImage(File? image) {
     _selectedImage = image;
   }
-  void _selectLocation(PlaceLocation? image) {
-    _selectedLocation = image;
+  void _selectLocation(PlaceLocation? location) {
+    _selectedLocation = location;
   }
 
   @override
