@@ -8,11 +8,7 @@ import 'dart:convert';
 
 import 'package:section13/models/place.dart';
 import 'package:section13/screens/map.dart';
-
-// Format of URL: endPoint?latlng=40.0,-72.0&key=API_KEY
-const String kMapsBaseURL = "https://maps.googleapis.com/maps/api";
-const String kMapsGeocode = "$kMapsBaseURL/geocode/json";
-const String kMapsStatic = "$kMapsBaseURL/staticmap";
+import 'package:section13/models/mapsConsts.dart';
 
 class LocationInput extends StatefulWidget {
   final void Function(PlaceLocation location) onSelectLocation;
@@ -30,22 +26,13 @@ class _LocationInputState extends State<LocationInput> {
   late final String _apiKey;
 
   @override
-  void initState() {
-    // TODO: implement initState
+  void initState() async {
     super.initState();
     rootBundle.loadString('assets/mapsAPI.private').then((value) {
-      _apiKey = value.trim();
+      setState(() {
+        _apiKey = value.trim();
+      });
     });
-  }
-
-  String get locationImageUrl {
-    if (_pickedLocation == null || _pickedLocation?.longitude == null || _pickedLocation?.latitude == null) {
-      return "";
-    }
-
-    final lat = _pickedLocation!.latitude;
-    final lng = _pickedLocation!.longitude;
-    return '$kMapsStatic?center=$lat,$lng&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:A%7C$lat,$lng&key=$_apiKey';
   }
 
   Future<void> _savePlace(double lat, double lng) async {
@@ -60,7 +47,6 @@ class _LocationInputState extends State<LocationInput> {
         latitude: lat,
         longitude: lng,
         address: address,
-        imageUrl: locationImageUrl
       );
       _isGettingLocation = true;
     });
@@ -117,7 +103,6 @@ class _LocationInputState extends State<LocationInput> {
 
   @override
   Widget build(BuildContext context) {
-    print("LInput: $_pickedLocation");
     Widget containerContent = Text("No location chosen",
       textAlign: TextAlign.center,
       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -128,7 +113,8 @@ class _LocationInputState extends State<LocationInput> {
       containerContent = const CircularProgressIndicator();
     }
     if (_pickedLocation != null) {
-      containerContent = Image.network(locationImageUrl,
+      final imageUrl = _pickedLocation!.locationImageUrl(_apiKey);
+      containerContent = Image.network(imageUrl,
         fit: BoxFit.cover,
         width: double.infinity,
         height: double.infinity,

@@ -3,7 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../models/place.dart';
 
-const defaultLocation = PlaceLocation(latitude: 37.422, longitude: -122.084, address: "Address", imageUrl: "");
+const defaultLocation = PlaceLocation(latitude: 37.422, longitude: -122.084, address: "Address");
 class MapScreen extends StatefulWidget {
   final PlaceLocation location;
   final bool isSelecting;

@@ -28,14 +28,21 @@ class _AddPlaceScreenState extends ConsumerState<AddPlacesScreen> {
       return;
     }
 
+    print("Before addPlace");
+    print(_selectedLocation);
     _formKey.currentState!.save();
-    ref.read(placesProvider.notifier).addPlace(Place(name: _enteredPlace, image: _selectedImage!, location: _selectedLocation!));
+    ref.read(placesProvider.notifier).addPlace(
+      name: _enteredPlace,
+      image: _selectedImage!,
+      location: _selectedLocation!
+    );
     Navigator.of(context).pop();
   }
   void _selectImage(File? image) {
     _selectedImage = image;
   }
   void _selectLocation(PlaceLocation? location) {
+    print("Returned Location: $location");
     _selectedLocation = location;
   }
 

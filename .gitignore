@@ -5,3 +5,4 @@ secrets
 *.private.*
 .next
 flutterTemplates
+AndroidManifest.xml

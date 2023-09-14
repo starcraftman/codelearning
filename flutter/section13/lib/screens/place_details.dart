@@ -1,18 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
+
 import 'package:section13/models/place.dart';
 import 'package:section13/screens/map.dart';
-
 import 'add_place.dart';
 
-class PlaceDetails extends StatelessWidget {
+class PlaceDetails extends StatefulWidget {
   final Place place;
   const PlaceDetails(this.place, {super.key});
+
+  @override
+  State<PlaceDetails> createState() => _PlaceDetailsState();
+}
+
+class _PlaceDetailsState extends State<PlaceDetails> {
+  late final String _apiKey;
+
+  @override
+  void initState() {
+    super.initState();
+    rootBundle.loadString('assets/mapsAPI.private').then((value) {
+      setState(() {
+        _apiKey = value.trim();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(place.name),
+        title: Text(widget.place.name),
         actions: [
           IconButton(onPressed: () {
             Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AddPlacesScreen()));
@@ -22,7 +40,7 @@ class PlaceDetails extends StatelessWidget {
       body: Stack(
         children: [
           Image.file(
-            place.image,
+            widget.place.image,
             fit: BoxFit.cover,
             width: double.infinity,
             height: double.infinity,
@@ -36,12 +54,14 @@ class PlaceDetails extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                    builder: (ctx) => MapScreen(location: place.location, isSelecting: false)
+                    builder: (ctx) => MapScreen(location: widget.place.location, isSelecting: false)
                   ));
                 },
                 child: CircleAvatar(
                   radius: 70,
-                  backgroundImage: NetworkImage(place.location.imageUrl)),
+                  backgroundImage: NetworkImage(widget.place.location.locationImageUrl(_apiKey)
+                  )
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -56,7 +76,7 @@ class PlaceDetails extends StatelessWidget {
                   ),
                 ),
                 alignment: Alignment.center,
-                child: Text(place.location.address,
+                child: Text(widget.place.location.address,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleLarge!.copyWith(
                     color: Theme.of(context).colorScheme.onBackground
