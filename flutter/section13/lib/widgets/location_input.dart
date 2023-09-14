@@ -26,7 +26,7 @@ class _LocationInputState extends State<LocationInput> {
   late final String _apiKey;
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
     rootBundle.loadString('assets/mapsAPI.private').then((value) {
       setState(() {

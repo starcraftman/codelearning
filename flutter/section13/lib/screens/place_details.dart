@@ -14,7 +14,7 @@ class PlaceDetails extends StatefulWidget {
 }
 
 class _PlaceDetailsState extends State<PlaceDetails> {
-  late final String _apiKey;
+  late String _apiKey = '';
 
   @override
   void initState() {
@@ -28,6 +28,17 @@ class _PlaceDetailsState extends State<PlaceDetails> {
 
   @override
   Widget build(BuildContext context) {
+    Widget circleAvatar = const CircleAvatar(
+      radius: 70,
+     foregroundColor: Colors.red,
+    );
+    if (_apiKey.isNotEmpty) {
+      circleAvatar = CircleAvatar(
+        radius: 70,
+        backgroundImage: NetworkImage(widget.place.location.locationImageUrl(_apiKey))
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.place.name),
@@ -57,11 +68,7 @@ class _PlaceDetailsState extends State<PlaceDetails> {
                     builder: (ctx) => MapScreen(location: widget.place.location, isSelecting: false)
                   ));
                 },
-                child: CircleAvatar(
-                  radius: 70,
-                  backgroundImage: NetworkImage(widget.place.location.locationImageUrl(_apiKey)
-                  )
-                ),
+                child: circleAvatar,
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
