@@ -21,18 +21,21 @@ class _AddPlaceScreenState extends ConsumerState<AddPlacesScreen> {
   final _formKey = GlobalKey<FormState>();
   String _enteredPlace = "";
   File? _selectedImage;
+  PlaceLocation? _selectedLocation;
 
   void _submitPlace() {
-    if (!_formKey.currentState!.validate() || _selectedImage == null) {
+    if (!_formKey.currentState!.validate() || _selectedImage == null || _selectedLocation == null) {
       return;
     }
     _formKey.currentState!.save();
-    ref.read(placesProvider.notifier).addPlace(Place(name: _enteredPlace, image: _selectedImage!));
+    ref.read(placesProvider.notifier).addPlace(Place(name: _enteredPlace, image: _selectedImage!, location: _selectedLocation!));
     Navigator.of(context).pop();
   }
-
   void _selectImage(File? image) {
     _selectedImage = image;
+  }
+  void _selectLocation(PlaceLocation? image) {
+    _selectedLocation = image;
   }
 
   @override
@@ -60,7 +63,7 @@ class _AddPlaceScreenState extends ConsumerState<AddPlacesScreen> {
           const SizedBox(height: 10,),
           ImageInput(onSelectImage: _selectImage),
           const SizedBox(height: 10,),
-          const LocationInput(),
+          LocationInput(onSelectLocation: _selectLocation),
           const SizedBox(height: 16,),
           ElevatedButton.icon(
             onPressed: () {
