@@ -6,3 +6,4 @@ secrets
 .next
 flutterTemplates
 AndroidManifest.xml
+firebase_options.dart
