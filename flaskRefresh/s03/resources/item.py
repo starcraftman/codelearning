@@ -5,22 +5,23 @@ from flask import request
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 
+from schemas import ItemSchema, ItemUpdateSchema
+
 blp = Blueprint('Items', __name__, description="Operations on items")
 
 
 @blp.route("/item/<string:item_id>")
 class Item(MethodView):
+    @blp.response(200, ItemSchema)
     def get(self, item_id):
         try:
-            return db.items[item_id], 200
+            return db.items[item_id]
         except KeyError:
             abort(404, message="No such item found")
 
-    def put(self, item_id):
-        data = request.get_json()
-        if "price" not in data or "name" not in data:
-            abort(400, message="Bad request. Missing required fields: 'price' or 'name'")
-
+    @blp.arguments(ItemUpdateSchema)
+    @blp.response(200, ItemSchema)
+    def put(self, data, item_id):
         try:
             db.items[item_id].update({
                 "name": data["name"],
@@ -41,17 +42,13 @@ class Item(MethodView):
 
 @blp.route("/item")
 class ItemList(MethodView):
+    @blp.response(200, ItemSchema(many=True))
     def get(self):
-        return {"items": list(db.items.values())}, 200
+        return list(db.items.values())
 
-    def post(self):
-        data = request.get_json()
-        if data['store_id'] not in db.stores:
-            abort(404, message="No such store found")
-        for field in ("price", "store_id", "name"):
-            if field not in data:
-                abort(400, message="Bad request. Required fields: 'price', 'store_id', 'name'")
-
+    @blp.arguments(ItemSchema)
+    @blp.response(201, ItemSchema)
+    def post(self, data):
         for item in db.items.values():
             if item['name'] == data['name'] and item['store_id'] == data['store_id']:
                 abort(400, message="Item already exists.")
@@ -60,4 +57,4 @@ class ItemList(MethodView):
         new_item = {**data, "id": item_id}
         db.items[item_id] = new_item
 
-        return new_item, 201
+        return new_item

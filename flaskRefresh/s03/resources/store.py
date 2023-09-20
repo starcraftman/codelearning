@@ -5,22 +5,23 @@ from flask import request
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 
+from schemas import StoreSchema, StoreUpdateSchema
+
 blp = Blueprint('Stores', __name__, description="Operations on stores")
 
 
 @blp.route("/store/<string:store_id>")
 class Store(MethodView):
+    @blp.response(200, StoreSchema)
     def get(self, store_id):
         try:
-            return db.stores[store_id], 200
+            return db.stores[store_id]
         except KeyError:
             abort(404, message="No such store found")
 
-    def put(self, store_id):
-        data = request.get_json()
-        if "name" not in data:
-            abort(400, message="Bad request. Missing required fields: 'name'")
-
+    @blp.arguments(StoreUpdateSchema)
+    @blp.response(200, StoreSchema)
+    def put(self, data, store_id):
         try:
             db.stores[store_id]['name'] = data['name']
             return db.stores[store_id]
@@ -38,14 +39,13 @@ class Store(MethodView):
 
 @blp.route("/store")
 class StoreList(MethodView):
+    @blp.arguments(StoreSchema(many=True))
     def get(self):
         return {"stores": list(db.stores.values())}
 
-    def post(self):
-        data = request.get_json()
-
-        if "name" not in data:
-            abort(400, message="Bad request. Missing: 'name'")
+    @blp.arguments(StoreSchema)
+    @blp.response(200, StoreSchema)
+    def post(self, data):
         found = list(filter(lambda s: s['name'] == data['name'], db.stores.values()))
         if found:
             abort(400, message="Store already exists.")
@@ -54,4 +54,4 @@ class StoreList(MethodView):
         new_store = {**data, "id": store_id}
         db.stores[store_id] = new_store
 
-        return new_store, 201
+        return new_store
