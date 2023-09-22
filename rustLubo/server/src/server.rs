@@ -27,7 +27,7 @@ impl Server {
 
                     match stream.read(&mut buffer) {
                         Err(e) => {
-                            println!("Failed to read onnection: {}", e);
+                            println!("Failed to read connection: {}", e);
                         },
 
                         Ok(_) => {
