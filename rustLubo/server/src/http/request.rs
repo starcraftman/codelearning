@@ -1,14 +1,14 @@
 use super::method::{RequestMethod, MethodError};
+use super::QueryString;
 use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 use std::str;
 use std::str::Utf8Error;
 
-#[derive(Debug)]
 pub struct Request<'buf> {
     path: &'buf str,
-    query_string: Option<&'buf str>,
+    query_string: Option<QueryString<'buf> >,
     method: RequestMethod,
 }
 
@@ -16,7 +16,7 @@ impl<'buf> Request <'buf> {
     pub fn test_get() -> Self {
         Request {
             path: "/index.html",
-            query_string: Some("color=green"),
+            query_string: Some(QueryString::from("color=green")),
             method: RequestMethod::GET,
         }
     }
@@ -39,7 +39,7 @@ impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
         let method: RequestMethod = method.parse()?;
         let mut query_string = None;
         if let Some(ind) = path.find('?') {
-            query_string = Some(&path[ind + 1..]);
+            query_string = Some(QueryString::from(&path[ind + 1..]));
             path = &path[..ind];
         }
 
@@ -104,6 +104,19 @@ impl From<MethodError> for ParseError {
 }
 
 impl Error for ParseError { }
+
+impl<'buf> Debug for Request<'buf> {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        match &self.query_string {
+            Some(val) => {
+                write!(f, "Request: {}\n\t{}\n\t{}", self.path, self.method, val)
+            },
+            None => {
+                write!(f, "Request: {}\n\t{}\n\t{}", self.path, self.method, "No QueryString")
+            },
+        }
+    }
+}
 
 /*
  * Notes from lectures

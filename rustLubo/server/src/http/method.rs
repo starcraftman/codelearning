@@ -1,3 +1,4 @@
+use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 
 #[derive(Debug)]
@@ -29,6 +30,18 @@ impl FromStr for RequestMethod {
             "PATCH" => Ok(Self::PATCH),
             _ => Err(MethodError),
         }
+    }
+}
+
+impl Display for RequestMethod {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        let method = match self {
+            RequestMethod::GET => "GET",
+            RequestMethod::DELETE => "DELETE",
+            RequestMethod::POST => "POST",
+            _ => "Don't Care",
+        };
+        write!(f, "RequestMethod: {}", method)
     }
 }
 
