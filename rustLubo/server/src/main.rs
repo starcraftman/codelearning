@@ -12,9 +12,9 @@ fn main() {
 
     let server = Server::new("127.0.0.1:8080".to_string());
     dbg!("{}", &server);
-
-    let req = Request::get(&server.addr);
-    dbg!("{}", &req);
     server.run();
+
+    // let req = Request::get(&server.addr);
+    // dbg!("{}", &req);
 }
 
