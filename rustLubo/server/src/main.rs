@@ -14,7 +14,7 @@ fn main() {
     dbg!("{}", &server);
     server.run();
 
-    // let req = Request::get(&server.addr);
-    // dbg!("{}", &req);
+    let req = Request::test_get();
+    dbg!("{}", &req);
 }
 
