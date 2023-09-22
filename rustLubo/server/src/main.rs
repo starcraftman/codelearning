@@ -1,18 +1,20 @@
-struct Server {
-    addr: String,
-}
+mod server;
+mod http;
 
-impl Server {
-    fn run(self) {
-        println!("Server running on: {}", self.addr);
-    }
+use server::Server;
+use http::Request;
+use http::RequestMethod;
 
-    fn new(addr: String) -> Self {
-        Server { addr }
-    }
-}
 
 fn main() {
+    let get = RequestMethod::GET("Hello".to_string());
+    dbg!("{}", get);
+
     let server = Server::new("127.0.0.1:8080".to_string());
+    dbg!("{}", &server);
+
+    let req = Request::get(&server.addr);
+    dbg!("{}", &req);
     server.run();
 }
+
