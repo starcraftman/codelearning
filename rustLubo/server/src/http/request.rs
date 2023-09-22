@@ -6,6 +6,7 @@ use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 use std::str;
 use std::str::Utf8Error;
 
+#[derive(Debug)]
 pub struct Request<'buf> {
     path: &'buf str,
     query_string: Option<QueryString<'buf> >,
@@ -104,19 +105,6 @@ impl From<MethodError> for ParseError {
 }
 
 impl Error for ParseError { }
-
-impl<'buf> Debug for Request<'buf> {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        match &self.query_string {
-            Some(val) => {
-                write!(f, "Request: {}\n\t{}\n\t{}", self.path, self.method, val)
-            },
-            None => {
-                write!(f, "Request: {}\n\t{}\n\t{}", self.path, self.method, "No QueryString")
-            },
-        }
-    }
-}
 
 /*
  * Notes from lectures

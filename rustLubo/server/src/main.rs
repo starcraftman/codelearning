@@ -11,8 +11,8 @@ fn main() {
     let get = RequestMethod::GET;
     dbg!("{}", &get);
     println!("{}", &get);
-    let qstring = http::QueryString::from("test=1,works=true,hello=world");
-    println!("{}", qstring);
+    let qstring = http::QueryString::from("test=1&works=true&hello=world");
+    dbg!(qstring);
 
     let req = Request::test_get();
     dbg!("{}", &req);

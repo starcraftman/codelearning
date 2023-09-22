@@ -2,10 +2,12 @@ use std::fmt::{Debug, Formatter, Result as FmtResult, Display};
 use std::collections::HashMap;
 
 // Example of query string format, multiple entries lead array: a=1&b=2&c&d=&e===&d=7&d=abc
+#[derive(Debug)]
 pub struct QueryString <'buf> {
     data: HashMap<&'buf str, Value<'buf> >
 }
 
+#[derive(Debug)]
 pub enum Value <'buf> {
     Single(&'buf str),
     Multiple(Vec<&'buf str>),
@@ -41,41 +43,4 @@ impl <'buf> From<&'buf str> for QueryString<'buf> {
 
         QueryString { data }
     }
-}
-
-impl <'buf> Debug for QueryString<'buf> {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        let mut result: FmtResult = write!(f, "QueryString HashMap follows:");
-        for (key, val) in &self.data {
-            match val {
-                Value::Single(val)  => {
-                    result = write!(f, "{}={}", key, val);
-                },
-                Value::Multiple(vec)  => {
-                    result = write!(f, "{}=(first){}", key, vec[0]);
-                },
-            }
-        }
-
-        result
-    }
-}
-
-impl <'buf> Display for QueryString<'buf> {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        let mut result: FmtResult = write!(f, "QueryString HashMap(");
-        for (key, val) in &self.data {
-            match val {
-                Value::Single(val)  => {
-                    result = write!(f, "{}={}, ", key, val);
-                },
-                Value::Multiple(vec)  => {
-                    result = write!(f, "{}=(first){}, ", key, vec[0]);
-                },
-            }
-        }
-
-        write!(f, ")")
-    }
-
 }
