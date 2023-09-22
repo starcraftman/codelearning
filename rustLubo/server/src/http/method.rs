@@ -39,7 +39,12 @@ impl Display for RequestMethod {
             RequestMethod::GET => "GET",
             RequestMethod::DELETE => "DELETE",
             RequestMethod::POST => "POST",
-            _ => "Don't Care",
+            RequestMethod::PUT => "PUT",
+            RequestMethod::HEAD => "HEAD",
+            RequestMethod::CONNECT => "CONNECT",
+            RequestMethod::OPTIONS => "OPTIONS",
+            RequestMethod::TRACE => "TRACE",
+            RequestMethod::PATCH => "PATCH",
         };
         write!(f, "RequestMethod: {}", method)
     }
