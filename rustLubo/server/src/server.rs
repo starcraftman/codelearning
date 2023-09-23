@@ -2,7 +2,7 @@ use std::convert::TryFrom;
 use std::io::Read;
 use std::net::TcpListener;
 
-use crate::http::Request;
+use crate::http::{Request, Response, StatusCode};
 
 #[derive(Debug)]
 pub struct Server {
@@ -32,14 +32,21 @@ impl Server {
 
                         Ok(_) => {
                             println!("Received a request: {}", String::from_utf8_lossy(&buffer));
-                            match Request::try_from(&buffer[..]) {
+                            let resp = match Request::try_from(&buffer[..]) {
                                 Err(e) => {
                                     println!("Err: {}", e);
+                                    Response::new(StatusCode::BadRequest, None)
                                 },
 
                                 Ok(request) => {
                                     dbg!(request);
+                                    // let resp = Response::new(StatusCode::NotFound, None);
+                                    Response::new(StatusCode::Ok, Some("<h1> It works </h1>".to_string()))
                                 },
+                            };
+
+                            if let Err(e) = resp.send(&mut stream) {
+                                println!("Failed to send response: {}", e);
                             }
                         },
                     }

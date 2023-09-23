@@ -1,4 +1,3 @@
-use std::fmt::{Debug, Formatter, Result as FmtResult, Display};
 use std::collections::HashMap;
 
 // Example of query string format, multiple entries lead array: a=1&b=2&c&d=&e===&d=7&d=abc
